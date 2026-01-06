@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leonardo Gutierrez Ferrara | Data Science & Fintech</title>
+    <meta name="description" content="Data Scientist specialized in Fintech, Machine Learning and Financial Analytics.">
+    <meta name="author" content="Leonardo Gutierrez Ferrara">
+    <link rel="canonical" href="https://axelovich.github.io/ds-portfolio/">
+    <meta property="og:title" content="Leonardo Gutierrez Ferrara | Data Science Portfolio">
+    <meta property="og:description" content="Data Scientist specialized in Fintech and Financial Analytics.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--bg:#111827;--bg-card:#1f2937;--bg-card-hover:#374151;--border:#374151;--text:#f9fafb;--text-secondary:#9ca3af;--text-muted:#6b7280;--blue:#3b82f6;--green:#10b981}
+        body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+        a{color:inherit;text-decoration:none}
+        .container{max-width:960px;margin:0 auto;padding:0 24px}
+        
+        /* Nav */
+        nav{padding:20px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+        .logo{font-weight:700;font-size:1.1rem}
+        .nav-right{display:flex;align-items:center;gap:16px}
+        .nav-links{display:flex;gap:24px}
+        .nav-links a{color:var(--text-secondary);font-size:0.9rem;transition:color 0.2s}
+        .nav-links a:hover{color:var(--text)}
+        .lang-toggle{display:flex;gap:4px}
+        .lang-btn{padding:4px 10px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;font-size:0.8rem;font-weight:600;border-radius:4px}
+        .lang-btn.active{background:var(--blue);color:white}
+        
+        /* Hero */
+        .hero{padding:80px 0 60px;text-align:center}
+        .hero h1{font-size:2.5rem;font-weight:700;margin-bottom:16px}
+        .hero h1 span{color:var(--blue)}
+        .hero p{font-size:1.1rem;color:var(--text-secondary);max-width:600px;margin:0 auto 32px}
+        .hero-links{display:flex;justify-content:center;gap:12px;margin-bottom:48px}
+        .hero-links a{padding:10px 20px;border-radius:8px;font-size:0.9rem;font-weight:500;transition:all 0.2s}
+        .btn-primary{background:var(--blue);color:white}
+        .btn-primary:hover{background:#2563eb}
+        .btn-secondary{background:var(--bg-card);border:1px solid var(--border)}
+        .btn-secondary:hover{background:var(--bg-card-hover)}
+        
+        .stats{display:flex;justify-content:center;gap:48px}
+        .stat{text-align:center}
+        .stat-value{font-size:1.5rem;font-weight:700;color:var(--blue)}
+        .stat-label{font-size:0.8rem;color:var(--text-muted)}
+        
+        /* Sections */
+        section{padding:60px 0}
+        .section-title{font-size:1.4rem;font-weight:600;margin-bottom:24px;display:flex;align-items:center;gap:12px}
+        .section-title::before{content:'';width:4px;height:24px;background:var(--blue);border-radius:2px}
+        
+        /* Projects */
+        .projects{display:grid;gap:16px}
+        .project{background:var(--bg-card);border-radius:12px;padding:24px;display:flex;gap:20px;transition:background 0.2s;border:1px solid transparent}
+        .project:hover{background:var(--bg-card-hover);border-color:var(--border)}
+        .project-icon{font-size:2rem;flex-shrink:0}
+        .project-content{flex:1}
+        .project h3{font-size:1.1rem;font-weight:600;margin-bottom:6px}
+        .project p{font-size:0.9rem;color:var(--text-secondary);margin-bottom:12px}
+        .tags{display:flex;gap:6px;flex-wrap:wrap}
+        .tag{font-size:0.75rem;padding:4px 8px;background:var(--bg);border-radius:4px;color:var(--text-muted)}
+        .project-arrow{color:var(--text-muted);align-self:center;font-size:1.2rem}
+        
+        /* Skills */
+        .skills-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+        .skill-card{background:var(--bg-card);border-radius:8px;padding:20px}
+        .skill-card h4{font-size:0.75rem;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;font-weight:600}
+        .skill-card ul{list-style:none}
+        .skill-card li{font-size:0.85rem;color:var(--text-secondary);padding:4px 0}
+        
+        /* Experience */
+        .timeline{display:flex;flex-direction:column;gap:20px}
+        .exp{display:flex;gap:20px;padding:20px;background:var(--bg-card);border-radius:8px}
+        .exp-left{min-width:100px}
+        .exp-date{font-size:0.8rem;color:var(--text-muted)}
+        .exp h4{font-size:1rem;font-weight:600;margin-bottom:2px}
+        .exp .company{font-size:0.85rem;color:var(--blue);margin-bottom:6px}
+        .exp p{font-size:0.85rem;color:var(--text-secondary)}
+        
+        /* Education */
+        .edu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+        .edu{background:var(--bg-card);border-radius:8px;padding:20px}
+        .edu h4{font-size:0.95rem;font-weight:600;margin-bottom:4px}
+        .edu .school{font-size:0.85rem;color:var(--blue);margin-bottom:4px}
+        .edu p{font-size:0.8rem;color:var(--text-muted)}
+        
+        /* Footer */
+        footer{padding:40px 0;border-top:1px solid var(--border);text-align:center}
+        .footer-links{display:flex;justify-content:center;gap:24px;margin-bottom:16px}
+        .footer-links a{color:var(--text-secondary);font-size:0.9rem}
+        .footer-links a:hover{color:var(--blue)}
+        .copyright{font-size:0.8rem;color:var(--text-muted)}
+        
+        @media(max-width:768px){
+            .skills-grid{grid-template-columns:repeat(2,1fr)}
+            .edu-grid{grid-template-columns:1fr}
+            .stats{gap:24px}
+            .hero h1{font-size:2rem}
+            .exp{flex-direction:column;gap:8px}
+            .exp-left{min-width:auto}
+            .nav-links{display:none}
+        }
+    </style>
+</head>
+<body>
+    <nav class="container">
+        <div class="logo">Leonardo G.F.</div>
+        <div class="nav-right">
+            <div class="nav-links">
+                <a href="#projects" data-i18n="nav-projects">Projects</a>
+                <a href="#experience" data-i18n="nav-experience">Experience</a>
+                <a href="#education" data-i18n="nav-education">Education</a>
+            </div>
+            <div class="lang-toggle">
+                <button class="lang-btn" onclick="setLang('es')">ES</button>
+                <button class="lang-btn active" onclick="setLang('en')">EN</button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Data Science & <span>Fintech</span></h1>
+            <p data-i18n="hero-sub">Building predictive models and dashboards for financial services. Turning complex data into actionable insights.</p>
+            <div class="hero-links">
+                <a href="#projects" class="btn-primary" data-i18n="cta-projects">View Projects</a>
+                <a href="https://linkedin.com/in/leo-gf" target="_blank" class="btn-secondary">LinkedIn →</a>
+                <a href="https://github.com/Axelovich" target="_blank" class="btn-secondary">GitHub →</a>
+            </div>
+            <div class="stats">
+                <div class="stat"><div class="stat-value">5+</div><div class="stat-label" data-i18n="stat-years">Years in Finance</div></div>
+                <div class="stat"><div class="stat-value">98th</div><div class="stat-label" data-i18n="stat-forecast">Forecast Percentile</div></div>
+                <div class="stat"><div class="stat-value">MSc</div><div class="stat-label">Finance · UdeSA</div></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects">
+        <div class="container">
+            <h2 class="section-title" data-i18n="section-projects">Projects</h2>
+            <div class="projects">
+                <a href="01_fintechs_latam.html" class="project">
+                    <div class="project-icon">📈</div>
+                    <div class="project-content">
+                        <h3 data-i18n="p1-title">LATAM Fintechs Analysis</h3>
+                        <p data-i18n="p1-desc">Performance comparison of MELI, Nubank, DLocal and StoneCo. Risk metrics and valuation analysis.</p>
+                        <div class="tags"><span class="tag">Python</span><span class="tag">Pandas</span><span class="tag">yfinance</span></div>
+                    </div>
+                    <div class="project-arrow">→</div>
+                </a>
+                <a href="02_macro_argentina.html" class="project">
+                    <div class="project-icon">🇦🇷</div>
+                    <div class="project-content">
+                        <h3 data-i18n="p2-title">Argentina Macro Dashboard</h3>
+                        <p data-i18n="p2-desc">Real-time monitoring of exchange rates, inflation and interest rates from BCRA APIs.</p>
+                        <div class="tags"><span class="tag">APIs</span><span class="tag">Chart.js</span><span class="tag">Real-time</span></div>
+                    </div>
+                    <div class="project-arrow">→</div>
+                </a>
+                <a href="03_credit_scoring.html" class="project">
+                    <div class="project-icon">🎯</div>
+                    <div class="project-content">
+                        <h3 data-i18n="p3-title">Credit Scoring Model</h3>
+                        <p data-i18n="p3-desc">Predictive default model with 0.867 AUC-ROC. Random Forest vs XGBoost comparison.</p>
+                        <div class="tags"><span class="tag">Scikit-learn</span><span class="tag">XGBoost</span><span class="tag">SHAP</span></div>
+                    </div>
+                    <div class="project-arrow">→</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills">
+        <div class="container">
+            <h2 class="section-title">Skills</h2>
+            <div class="skills-grid">
+                <div class="skill-card"><h4>Data</h4><ul><li>Python</li><li>SQL</li><li>Pandas</li></ul></div>
+                <div class="skill-card"><h4>ML</h4><ul><li>Scikit-learn</li><li>XGBoost</li><li>TensorFlow</li></ul></div>
+                <div class="skill-card"><h4>Viz</h4><ul><li>Power BI</li><li>Tableau</li><li>Excel</li></ul></div>
+                <div class="skill-card"><h4>FP&A</h4><ul><li>Budgeting</li><li>Forecasting</li><li>KPIs</li></ul></div>
+                <div class="skill-card"><h4 data-i18n="skill-finance">Finance</h4><ul><li>Valuation</li><li>DCF</li><li>Derivatives</li></ul></div>
+                <div class="skill-card"><h4>Web</h4><ul><li>HTML/CSS</li><li>JavaScript</li><li>React</li></ul></div>
+                <div class="skill-card"><h4>Automation</h4><ul><li>VBA</li><li>APIs</li><li>ETL</li></ul></div>
+                <div class="skill-card"><h4>Marketing</h4><ul><li>Google Ads</li><li>SEO</li><li>Analytics</li></ul></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="experience">
+        <div class="container">
+            <h2 class="section-title" data-i18n="section-exp">Experience</h2>
+            <div class="timeline">
+                <div class="exp">
+                    <div class="exp-left"><div class="exp-date">2024-2025</div></div>
+                    <div>
+                        <h4>Product Planning Lead</h4>
+                        <div class="company">Visa Argentina (Prisma)</div>
+                        <p data-i18n="visa-desc">Cross-factory collaboration, cost optimization. 98th percentile forecasting. Built data lake alerts. Visa APA Award.</p>
+                    </div>
+                </div>
+                <div class="exp">
+                    <div class="exp-left"><div class="exp-date">2023</div></div>
+                    <div>
+                        <h4>Financial Analyst</h4>
+                        <div class="company">Stealth Fintech Startup</div>
+                        <p data-i18n="stealth-desc">Financial models, SQL dashboards, investor pitch decks, market research.</p>
+                    </div>
+                </div>
+                <div class="exp">
+                    <div class="exp-left"><div class="exp-date">2021-2023</div></div>
+                    <div>
+                        <h4>Financial Advisor (CNV)</h4>
+                        <div class="company">Balanz Capital</div>
+                        <p data-i18n="balanz-desc">400+ accounts, top 10% by AUM. Traded derivatives and corporate debt.</p>
+                    </div>
+                </div>
+                <div class="exp">
+                    <div class="exp-left"><div class="exp-date">2025+</div></div>
+                    <div>
+                        <h4>Founder</h4>
+                        <div class="company">El Pulso Fintech & LGF Consulting</div>
+                        <p data-i18n="founder-desc">Fintech media (30+ articles) and boutique consultancy for SMBs.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="education">
+        <div class="container">
+            <h2 class="section-title" data-i18n="section-edu">Education</h2>
+            <div class="edu-grid">
+                <div class="edu">
+                    <h4>MSc Finance</h4>
+                    <div class="school">Universidad de San Andrés</div>
+                    <p>2023-2026 · Quant Focus · CFA Aligned</p>
+                </div>
+                <div class="edu">
+                    <h4>BSc Economics</h4>
+                    <div class="school">Universidad de San Andrés</div>
+                    <p>2016-2021 · Data Science minor</p>
+                </div>
+                <div class="edu">
+                    <h4>BSc Economics</h4>
+                    <div class="school">University College London</div>
+                    <p data-i18n="ucl">2019 · Exchange Program</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="https://linkedin.com/in/leo-gf" target="_blank">LinkedIn</a>
+                <a href="https://github.com/Axelovich" target="_blank">GitHub</a>
+                <a href="mailto:leonardo@lgf-consulting.com">Email</a>
+                <a href="https://lgf-consulting.com" target="_blank">lgf-consulting.com</a>
+            </div>
+            <div class="copyright">© 2025 Leonardo Gutierrez Ferrara</div>
+        </div>
+    </footer>
+
+    <script>
+        const i18n={
+            es:{'nav-projects':'Proyectos','nav-experience':'Experiencia','nav-education':'Educación','hero-sub':'Modelos predictivos y dashboards para servicios financieros. Transformando datos complejos en insights accionables.','cta-projects':'Ver Proyectos','stat-years':'Años en Finanzas','stat-forecast':'Percentil Forecast','section-projects':'Proyectos','p1-title':'Análisis Fintechs LATAM','p1-desc':'Comparativa de MELI, Nubank, DLocal y StoneCo. Métricas de riesgo y análisis de valuación.','p2-title':'Dashboard Macro Argentina','p2-desc':'Monitoreo real-time de tipo de cambio, inflación y tasas desde APIs del BCRA.','p3-title':'Modelo Credit Scoring','p3-desc':'Modelo predictivo de default con 0.867 AUC-ROC. Comparación Random Forest vs XGBoost.','skill-finance':'Finanzas','section-exp':'Experiencia','visa-desc':'Colaboración cross-factory, optimización de costos. 98th percentile en forecasting. Alertas data lake. Premio Visa APA.','stealth-desc':'Modelos financieros, dashboards SQL, pitch decks, research de mercado.','balanz-desc':'400+ cuentas, top 10% por AUM. Trading de derivados y deuda corporativa.','founder-desc':'Media fintech (30+ artículos) y consultora boutique para PyMEs.','section-edu':'Educación','ucl':'2019 · Intercambio'},
+            en:{'nav-projects':'Projects','nav-experience':'Experience','nav-education':'Education','hero-sub':'Building predictive models and dashboards for financial services. Turning complex data into actionable insights.','cta-projects':'View Projects','stat-years':'Years in Finance','stat-forecast':'Forecast Percentile','section-projects':'Projects','p1-title':'LATAM Fintechs Analysis','p1-desc':'Performance comparison of MELI, Nubank, DLocal and StoneCo. Risk metrics and valuation analysis.','p2-title':'Argentina Macro Dashboard','p2-desc':'Real-time monitoring of exchange rates, inflation and interest rates from BCRA APIs.','p3-title':'Credit Scoring Model','p3-desc':'Predictive default model with 0.867 AUC-ROC. Random Forest vs XGBoost comparison.','skill-finance':'Finance','section-exp':'Experience','visa-desc':'Cross-factory collaboration, cost optimization. 98th percentile forecasting. Built data lake alerts. Visa APA Award.','stealth-desc':'Financial models, SQL dashboards, investor pitch decks, market research.','balanz-desc':'400+ accounts, top 10% by AUM. Traded derivatives and corporate debt.','founder-desc':'Fintech media (30+ articles) and boutique consultancy for SMBs.','section-edu':'Education','ucl':'2019 · Exchange Program'}
+        };
+        function setLang(lang){
+            document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+            document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+            document.querySelectorAll('[data-i18n]').forEach(el=>{
+                const k=el.getAttribute('data-i18n');
+                if(i18n[lang][k])el.textContent=i18n[lang][k];
+            });
+            localStorage.setItem('lang',lang);
+        }
+        setLang(localStorage.getItem('lang')||'en');
+    </script>
+</body>
+</html>

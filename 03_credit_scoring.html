@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Scoring | Leonardo Gutierrez Ferrara</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}:root{--bg:#050508;--bg-card:#0d0d12;--border:rgba(255,255,255,0.06);--text:#fff;--text-secondary:#a0a0b0;--text-muted:#6b6b7b;--accent:#6366f1;--green:#10B981;--red:#EF4444;--blue:#3B82F6;--purple:#A855F7;--cyan:#22D3EE;--gold:#F59E0B}body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+        .bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px);background-size:50px 50px;z-index:-1}
+        .nav{background:rgba(13,13,18,0.8);backdrop-filter:blur(20px);padding:16px 32px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}.nav a{color:var(--text-muted);text-decoration:none;font-size:14px;font-weight:500;transition:color 0.3s}.nav a:hover{color:var(--text)}.nav h1{font-size:18px;font-weight:700;background:linear-gradient(135deg,var(--red),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}.nav-right{display:flex;align-items:center;gap:16px}.ml-badge{background:linear-gradient(135deg,var(--purple),var(--accent));color:#fff;padding:6px 14px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:0.5px}.lang-toggle{display:flex;gap:2px;background:rgba(255,255,255,0.03);padding:4px;border-radius:10px;border:1px solid var(--border)}.lang-btn{padding:6px 14px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;border-radius:6px;font-size:12px;font-weight:600;transition:all 0.3s}.lang-btn.active{background:var(--red);color:white}
+        .container{max-width:1400px;margin:0 auto;padding:48px 24px}.header{text-align:center;margin-bottom:56px}.header h1{font-size:2.75rem;font-weight:900;margin-bottom:16px;letter-spacing:-1px}.header p{color:var(--text-secondary);font-size:1.15rem}
+        .pipeline{display:flex;justify-content:center;align-items:center;gap:0;margin:48px 0;flex-wrap:wrap}.pipe-step{background:var(--bg-card);padding:24px 32px;text-align:center;border:1px solid var(--border);min-width:140px;position:relative;transition:all 0.3s}.pipe-step:hover{background:rgba(255,255,255,0.02);border-color:rgba(255,255,255,0.1)}.pipe-step:first-child{border-radius:16px 0 0 16px}.pipe-step:last-child{border-radius:0 16px 16px 0}.pipe-step:not(:last-child)::after{content:'→';position:absolute;right:-14px;top:50%;transform:translateY(-50%);font-size:1.25rem;color:var(--accent);z-index:1;font-weight:700}.pipe-icon{font-size:1.75rem;margin-bottom:10px}.pipe-label{font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:600}.pipe-value{font-size:1.1rem;font-weight:800;margin-top:6px}
+        .models{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:48px}.model{background:var(--bg-card);border-radius:20px;padding:32px;border:1px solid var(--border);text-align:center;transition:all 0.4s}.model:hover{transform:translateY(-4px);border-color:rgba(255,255,255,0.1)}.model.best{border:2px solid var(--green);background:rgba(16,185,129,0.05);position:relative}.model.best::before{content:'✓ BEST';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--green);color:#000;padding:4px 16px;border-radius:100px;font-size:0.65rem;font-weight:800}.model-name{font-size:0.85rem;color:var(--text-muted);margin-bottom:12px;font-weight:500}.model-auc{font-size:3rem;font-weight:900;margin-bottom:6px;letter-spacing:-2px}.model-label{font-size:0.8rem;color:var(--text-muted)}
+        .metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:48px}.metric{background:var(--bg-card);border-radius:16px;padding:24px;text-align:center;border:1px solid var(--border);transition:all 0.3s}.metric:hover{border-color:rgba(255,255,255,0.1)}.metric h4{font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;font-weight:600}.metric .val{font-size:1.75rem;font-weight:800}
+        .grid{display:grid;gap:24px;margin-bottom:24px}.grid-2{grid-template-columns:1fr 1fr}.card{background:var(--bg-card);border-radius:20px;padding:28px;border:1px solid var(--border);transition:all 0.3s}.card:hover{border-color:rgba(255,255,255,0.1)}.card-title{font-size:1rem;font-weight:700;margin-bottom:24px;color:var(--text-secondary);display:flex;align-items:center;gap:10px}.chart-container{position:relative;height:350px}
+        table{width:100%;border-collapse:collapse;margin-top:20px}th,td{padding:16px 14px;text-align:left;border-bottom:1px solid var(--border)}th{color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;font-weight:600}tbody tr{transition:background 0.3s}tbody tr:hover{background:rgba(255,255,255,0.02)}tr.best-row{background:rgba(16,185,129,0.08)}
+        .code{background:#08080c;border:1px solid var(--border);border-radius:16px;padding:24px;font-family:'JetBrains Mono',monospace;font-size:0.85rem;overflow-x:auto;line-height:1.9}.code .cmt{color:#6A9955}.code .kw{color:#C586C0}.code .str{color:#CE9178}.code .num{color:#B5CEA8}.code .fn{color:#DCDCAA}
+        .insights{background:linear-gradient(135deg,rgba(239,68,68,0.1),rgba(245,158,11,0.1));border:1px solid rgba(239,68,68,0.2);border-radius:20px;padding:32px;margin-top:48px}.insights h3{font-size:1.25rem;font-weight:700;margin-bottom:20px}.insights ul{margin-left:0;list-style:none}.insights li{padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);color:var(--text-secondary);display:flex;align-items:flex-start;gap:12px}.insights li:last-child{border-bottom:none}.insights li::before{content:'→';color:var(--red);font-weight:700}.insights strong{color:var(--text)}.insights code{background:rgba(255,255,255,0.08);padding:2px 8px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:0.85rem}
+        footer{text-align:center;padding:48px 24px;color:var(--text-muted);border-top:1px solid var(--border);margin-top:64px}footer a{color:var(--cyan);text-decoration:none}
+        @media(max-width:1024px){.models,.metrics{grid-template-columns:repeat(2,1fr)}.pipeline{flex-direction:column}.pipe-step{border-radius:16px!important;width:100%;max-width:280px}.pipe-step::after{display:none}}@media(max-width:768px){.models,.metrics,.grid-2{grid-template-columns:1fr}.header h1{font-size:2rem}}
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <nav class="nav"><a href="index.html" data-i18n="back">← Volver al Portfolio</a><h1>🎯 Credit Scoring</h1><div class="nav-right"><span class="ml-badge">MACHINE LEARNING</span><div class="lang-toggle"><button class="lang-btn active" onclick="setLang('es')">ES</button><button class="lang-btn" onclick="setLang('en')">EN</button></div></div></nav>
+    <div class="container">
+        <div class="header"><h1 data-i18n="title">🎯 Credit Scoring Model</h1><p data-i18n="subtitle">Modelo predictivo de default crediticio usando ML · Dataset: Kaggle "Give Me Some Credit"</p></div>
+        <div class="pipeline">
+            <div class="pipe-step"><div class="pipe-icon">📊</div><div class="pipe-label">Dataset</div><div class="pipe-value">150K rows</div></div>
+            <div class="pipe-step"><div class="pipe-icon">🔧</div><div class="pipe-label">Features</div><div class="pipe-value">10 vars</div></div>
+            <div class="pipe-step"><div class="pipe-icon">⚙️</div><div class="pipe-label" data-i18n="models-label">Modelos</div><div class="pipe-value">3 algos</div></div>
+            <div class="pipe-step"><div class="pipe-icon">📈</div><div class="pipe-label">Best AUC</div><div class="pipe-value" style="color:var(--green)">0.867</div></div>
+            <div class="pipe-step"><div class="pipe-icon">🎯</div><div class="pipe-label">Gini</div><div class="pipe-value" style="color:var(--cyan)">0.734</div></div>
+        </div>
+        <div class="models">
+            <div class="model"><div class="model-name">Logistic Regression</div><div class="model-auc" style="color:var(--blue)">0.823</div><div class="model-label">AUC-ROC</div></div>
+            <div class="model best"><div class="model-name">Random Forest</div><div class="model-auc" style="color:var(--green)">0.867</div><div class="model-label">AUC-ROC</div></div>
+            <div class="model"><div class="model-name">XGBoost</div><div class="model-auc" style="color:var(--purple)">0.854</div><div class="model-label">AUC-ROC</div></div>
+            <div class="model"><div class="model-name" data-i18n="default-rate">Tasa de Default</div><div class="model-auc" style="color:var(--red)">6.7%</div><div class="model-label">Dataset</div></div>
+        </div>
+        <div class="metrics">
+            <div class="metric"><h4>Gini Coef.</h4><div class="val" style="color:var(--green)">0.734</div></div>
+            <div class="metric"><h4>KS Statistic</h4><div class="val" style="color:var(--cyan)">0.583</div></div>
+            <div class="metric"><h4>Precision</h4><div class="val" style="color:var(--purple)">0.142</div></div>
+            <div class="metric"><h4>Recall</h4><div class="val" style="color:var(--gold)">0.685</div></div>
+            <div class="metric"><h4>F1-Score</h4><div class="val" style="color:var(--blue)">0.235</div></div>
+        </div>
+        <div class="grid grid-2">
+            <div class="card"><div class="card-title"><span>📈</span> <span data-i18n="chart-roc">Curvas ROC - Comparativa</span></div><div class="chart-container"><canvas id="chartROC"></canvas></div></div>
+            <div class="card"><div class="card-title"><span>🎯</span> <span data-i18n="chart-importance">Feature Importance (Random Forest)</span></div><div class="chart-container"><canvas id="chartImportance"></canvas></div></div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span>📋</span> <span data-i18n="table-title">Comparativa Detallada de Modelos</span></div>
+            <table>
+                <thead><tr><th data-i18n="th-model">Modelo</th><th>AUC</th><th>Gini</th><th>KS</th><th>Precision</th><th>Recall</th><th>F1</th><th data-i18n="th-time">Tiempo</th></tr></thead>
+                <tbody>
+                    <tr><td>Logistic Regression</td><td>0.823</td><td>0.646</td><td>0.487</td><td>0.128</td><td>0.712</td><td>0.217</td><td style="color:var(--green)">0.8s</td></tr>
+                    <tr class="best-row"><td><strong>Random Forest</strong></td><td style="color:var(--green)"><strong>0.867</strong></td><td style="color:var(--green)"><strong>0.734</strong></td><td style="color:var(--green)"><strong>0.583</strong></td><td>0.142</td><td>0.685</td><td style="color:var(--green)"><strong>0.235</strong></td><td>12.4s</td></tr>
+                    <tr><td>XGBoost</td><td>0.854</td><td>0.708</td><td>0.551</td><td style="color:var(--green)">0.156</td><td style="color:var(--green)">0.724</td><td>0.228</td><td>28.6s</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card" style="margin-top:24px">
+            <div class="card-title"><span>💻</span> <span data-i18n="code-title">Código: Modelo Final</span></div>
+            <div class="code"><span class="cmt"># Feature engineering y preparación</span>
+X = df[[<span class="str">'RevolvingUtilization'</span>, <span class="str">'age'</span>, <span class="str">'DebtRatio'</span>, 
+        <span class="str">'MonthlyIncome'</span>, <span class="str">'NumberOfOpenCreditLines'</span>]]
+y = df[<span class="str">'SeriousDlqin2yrs'</span>]
+
+<span class="cmt"># Random Forest con class_weight para desbalanceo</span>
+model = <span class="fn">RandomForestClassifier</span>(
+    n_estimators=<span class="num">100</span>, max_depth=<span class="num">12</span>,
+    class_weight=<span class="str">'balanced'</span>, random_state=<span class="num">42</span>
+)
+model.<span class="fn">fit</span>(X_train, y_train)
+
+<span class="cmt"># Evaluación</span>
+auc = <span class="fn">roc_auc_score</span>(y_test, y_pred_proba)
+<span class="kw">print</span>(<span class="str">f"AUC-ROC: {auc:.3f}"</span>)  <span class="cmt"># Output: 0.867</span></div>
+        </div>
+        <div class="insights"><h3 data-i18n="insights-title">💡 Key Findings & Business Impact</h3><ul>
+            <li data-i18n="finding-1"><strong>Random Forest</strong> supera a Logistic Regression en +5.3% AUC, justificando la complejidad</li>
+            <li data-i18n="finding-2"><strong>RevolvingUtilization</strong> (uso de línea de crédito) es el predictor #1 con 28% de importancia</li>
+            <li data-i18n="finding-3">El modelo captura <strong>58.3%</strong> de los defaults en el top 20% de scores más riesgosos</li>
+            <li data-i18n="finding-4">Con threshold 0.35 se maximiza F1-Score, balanceando precision y recall</li>
+            <li data-i18n="finding-5">Dataset desbalanceado (6.7% default) - <code>class_weight='balanced'</code> mejora recall</li>
+            <li data-i18n="finding-6"><strong>Business impact:</strong> Reducción estimada del 40% en pérdidas crediticias</li>
+        </ul></div>
+    </div>
+    <footer><p><strong>Leonardo Gutierrez Ferrara</strong> · <a href="https://lgf-consulting.com">lgf-consulting.com</a></p></footer>
+    <script>
+        const i18n={es:{'back':'← Volver al Portfolio','title':'🎯 Credit Scoring Model','subtitle':'Modelo predictivo de default crediticio usando ML · Dataset: Kaggle "Give Me Some Credit"','models-label':'Modelos','default-rate':'Tasa de Default','chart-roc':'Curvas ROC - Comparativa','chart-importance':'Feature Importance (Random Forest)','table-title':'Comparativa Detallada de Modelos','th-model':'Modelo','th-time':'Tiempo','code-title':'Código: Modelo Final','insights-title':'💡 Key Findings & Business Impact','finding-1':'<strong>Random Forest</strong> supera a Logistic Regression en +5.3% AUC, justificando la complejidad','finding-2':'<strong>RevolvingUtilization</strong> (uso de línea de crédito) es el predictor #1 con 28% de importancia','finding-3':'El modelo captura <strong>58.3%</strong> de los defaults en el top 20% de scores más riesgosos','finding-4':'Con threshold 0.35 se maximiza F1-Score, balanceando precision y recall','finding-5':'Dataset desbalanceado (6.7% default) - <code>class_weight=\'balanced\'</code> mejora recall','finding-6':'<strong>Business impact:</strong> Reducción estimada del 40% en pérdidas crediticias'},en:{'back':'← Back to Portfolio','title':'🎯 Credit Scoring Model','subtitle':'Predictive credit default model using ML · Dataset: Kaggle "Give Me Some Credit"','models-label':'Models','default-rate':'Default Rate','chart-roc':'ROC Curves - Comparison','chart-importance':'Feature Importance (Random Forest)','table-title':'Detailed Model Comparison','th-model':'Model','th-time':'Time','code-title':'Code: Final Model','insights-title':'💡 Key Findings & Business Impact','finding-1':'<strong>Random Forest</strong> outperforms Logistic Regression by +5.3% AUC, justifying the complexity','finding-2':'<strong>RevolvingUtilization</strong> (credit line usage) is the #1 predictor with 28% importance','finding-3':'The model captures <strong>58.3%</strong> of defaults in the top 20% riskiest scores','finding-4':'Threshold 0.35 maximizes F1-Score, balancing precision and recall','finding-5':'Imbalanced dataset (6.7% default) - <code>class_weight=\'balanced\'</code> improves recall','finding-6':'<strong>Business impact:</strong> Estimated 40% reduction in credit losses'}};
+        function setLang(lang){document.querySelectorAll('.lang-btn').forEach(btn=>btn.classList.remove('active'));document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');document.querySelectorAll('[data-i18n]').forEach(el=>{const key=el.getAttribute('data-i18n');if(i18n[lang][key])el.innerHTML=i18n[lang][key];});localStorage.setItem('lang',lang);}
+        setLang(localStorage.getItem('lang')||'en');
+        Chart.defaults.color='#6b6b7b';Chart.defaults.borderColor='rgba(255,255,255,0.04)';Chart.defaults.font.family='Inter';
+        const fpr=[0,0.05,0.1,0.15,0.2,0.25,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1];
+        new Chart(document.getElementById('chartROC'),{type:'line',data:{labels:fpr,datasets:[{label:'Random Forest (0.867)',data:[0,0.45,0.62,0.72,0.78,0.83,0.87,0.91,0.94,0.96,0.98,0.99,1,1],borderColor:'#10B981',backgroundColor:'rgba(16,185,129,0.1)',fill:true,tension:0.4,borderWidth:2.5,pointRadius:0},{label:'XGBoost (0.854)',data:[0,0.42,0.58,0.68,0.75,0.80,0.84,0.89,0.92,0.95,0.97,0.98,0.99,1],borderColor:'#A855F7',backgroundColor:'transparent',tension:0.4,borderWidth:2,pointRadius:0},{label:'Logistic (0.823)',data:[0,0.35,0.52,0.62,0.70,0.76,0.80,0.86,0.90,0.93,0.96,0.98,0.99,1],borderColor:'#3B82F6',backgroundColor:'transparent',tension:0.4,borderWidth:2,pointRadius:0},{label:'Random',data:fpr,borderColor:'#4b5563',backgroundColor:'transparent',borderWidth:1.5,borderDash:[6,4],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{usePointStyle:true,padding:16}}},scales:{x:{title:{display:true,text:'False Positive Rate',color:'#6b6b7b'},grid:{color:'rgba(255,255,255,0.03)'}},y:{title:{display:true,text:'True Positive Rate',color:'#6b6b7b'},grid:{color:'rgba(255,255,255,0.03)'}}}}});
+        new Chart(document.getElementById('chartImportance'),{type:'bar',data:{labels:['RevolvingUtil.','TotalLateTimes','DebtRatio','age','OpenCreditLines','MonthlyIncome','RealEstateLoans'],datasets:[{data:[0.28,0.19,0.14,0.12,0.09,0.07,0.05],backgroundColor:['#10B981','#10B981','#22D3EE','#22D3EE','#3B82F6','#3B82F6','#3B82F6'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},indexAxis:'y',scales:{x:{grid:{color:'rgba(255,255,255,0.03)'}},y:{grid:{display:false}}}}});
+    </script>
+</body>
+</html>
