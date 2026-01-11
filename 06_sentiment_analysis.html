@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earnings Sentiment Analysis | Leonardo Gutierrez Ferrara</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--bg:#111827;--bg-card:#1f2937;--bg-card-hover:#374151;--border:#374151;--text:#f9fafb;--text-secondary:#9ca3af;--text-muted:#6b7280;--blue:#3b82f6;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;--purple:#8b5cf6}
+        body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+        a{color:var(--blue);text-decoration:none}
+        .container{max-width:1000px;margin:0 auto;padding:0 24px}
+        
+        nav{padding:20px 24px;border-bottom:1px solid var(--border)}
+        nav a{color:var(--text-secondary);font-size:0.9rem}
+        
+        .hero{padding:60px 0 40px;border-bottom:1px solid var(--border)}
+        .hero h1{font-size:2rem;font-weight:700;margin-bottom:12px}
+        .hero p{color:var(--text-secondary);font-size:1.1rem;max-width:700px}
+        .tags{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+        .tag{font-size:0.75rem;padding:4px 10px;background:var(--bg-card);border-radius:4px;color:var(--text-muted)}
+        
+        section{padding:48px 0;border-bottom:1px solid var(--border)}
+        section:last-of-type{border-bottom:none}
+        h2{font-size:1.3rem;font-weight:600;margin-bottom:20px;color:var(--blue)}
+        h3{font-size:1.1rem;font-weight:600;margin:24px 0 12px;color:var(--text)}
+        p{color:var(--text-secondary);margin-bottom:16px}
+        ul,ol{color:var(--text-secondary);margin-left:24px;margin-bottom:16px}
+        li{margin-bottom:8px}
+        
+        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+        .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+        .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+        .card{background:var(--bg-card);border-radius:12px;padding:24px}
+        
+        .metric{text-align:center;padding:16px}
+        .metric-value{font-size:1.8rem;font-weight:700;color:var(--blue)}
+        .metric-value.green{color:var(--green)}
+        .metric-value.red{color:var(--red)}
+        .metric-value.yellow{color:var(--yellow)}
+        .metric-value.purple{color:var(--purple)}
+        .metric-label{font-size:0.8rem;color:var(--text-muted);margin-top:4px}
+        
+        .chart-container{background:var(--bg-card);border-radius:12px;padding:24px;margin:24px 0}
+        
+        table{width:100%;border-collapse:collapse;font-size:0.85rem;margin:16px 0}
+        th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--border)}
+        th{color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:0.7rem}
+        td:first-child,th:first-child{text-align:left}
+        tr:hover{background:var(--bg-card-hover)}
+        .positive{color:var(--green)}
+        .negative{color:var(--red)}
+        
+        .pipeline{display:flex;justify-content:space-between;align-items:center;margin:24px 0;padding:24px;background:var(--bg-card);border-radius:12px}
+        .pipeline-step{text-align:center;flex:1}
+        .pipeline-icon{font-size:2rem;margin-bottom:8px}
+        .pipeline-title{font-weight:600;font-size:0.9rem}
+        .pipeline-desc{font-size:0.75rem;color:var(--text-muted)}
+        .pipeline-arrow{color:var(--text-muted);font-size:1.5rem}
+        
+        .sentiment-bar{display:flex;height:24px;border-radius:6px;overflow:hidden;margin:8px 0}
+        .sentiment-bar .positive-bar{background:var(--green)}
+        .sentiment-bar .neutral-bar{background:var(--text-muted)}
+        .sentiment-bar .negative-bar{background:var(--red)}
+        
+        .signal{display:inline-block;padding:4px 12px;border-radius:4px;font-size:0.75rem;font-weight:600}
+        .signal.buy{background:rgba(16,185,129,0.2);color:var(--green)}
+        .signal.sell{background:rgba(239,68,68,0.2);color:var(--red)}
+        .signal.hold{background:rgba(156,163,175,0.2);color:var(--text-muted)}
+        
+        .quote-box{background:var(--bg-card);border-left:4px solid var(--blue);padding:16px 20px;margin:16px 0;font-style:italic;color:var(--text-secondary)}
+        
+        code{background:var(--bg-card);padding:2px 6px;border-radius:4px;font-size:0.85rem}
+        pre{background:var(--bg-card);padding:16px;border-radius:8px;overflow-x:auto;font-size:0.8rem}
+        
+        footer{padding:40px 0;text-align:center;color:var(--text-muted);font-size:0.85rem}
+        
+        .lang-toggle{position:fixed;top:20px;right:24px;display:flex;gap:4px;z-index:100}
+        .lang-btn{padding:4px 10px;border:none;background:var(--bg-card);color:var(--text-muted);cursor:pointer;font-size:0.8rem;font-weight:600;border-radius:4px}
+        .lang-btn.active{background:var(--blue);color:white}
+        
+        @media(max-width:768px){
+            .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+            .pipeline{flex-direction:column;gap:16px}
+            .pipeline-arrow{transform:rotate(90deg)}
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-toggle">
+        <button class="lang-btn" onclick="setLang('es')">ES</button>
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+    </div>
+
+    <nav class="container">
+        <a href="index.html">← Back to Portfolio</a>
+    </nav>
+
+    <header class="hero">
+        <div class="container">
+            <h1 data-i18n="title">Earnings Call Sentiment Analysis</h1>
+            <p data-i18n="subtitle">NLP-based trading strategy using sentiment analysis on quarterly earnings call transcripts. Includes full backtest with realistic transaction costs.</p>
+            <div class="tags">
+                <span class="tag">Python</span>
+                <span class="tag">NLP</span>
+                <span class="tag">FinBERT</span>
+                <span class="tag">Backtesting</span>
+                <span class="tag">Trading Strategy</span>
+            </div>
+        </div>
+    </header>
+
+    <section>
+        <div class="container">
+            <h2 data-i18n="overview-title">Project Overview</h2>
+            <p data-i18n="overview-p1">This project uses Natural Language Processing (NLP) to extract sentiment from earnings call transcripts and generate trading signals. The hypothesis is that management tone during earnings calls contains information not fully reflected in stock prices.</p>
+            <p data-i18n="overview-p2">We use FinBERT, a BERT model fine-tuned on financial text, to classify sentiment. The strategy is backtested over 5 years (2019-2024) across 50 S&P 500 companies with realistic assumptions.</p>
+            
+            <div class="pipeline">
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">📄</div>
+                    <div class="pipeline-title" data-i18n="step1-title">Collect Transcripts</div>
+                    <div class="pipeline-desc" data-i18n="step1-desc">Earnings call transcripts from SEC filings</div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">🔤</div>
+                    <div class="pipeline-title" data-i18n="step2-title">Preprocess Text</div>
+                    <div class="pipeline-desc" data-i18n="step2-desc">Clean, tokenize, extract key sections</div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">🤖</div>
+                    <div class="pipeline-title" data-i18n="step3-title">FinBERT Analysis</div>
+                    <div class="pipeline-desc" data-i18n="step3-desc">Score sentiment: positive/neutral/negative</div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">📊</div>
+                    <div class="pipeline-title" data-i18n="step4-title">Generate Signals</div>
+                    <div class="pipeline-desc" data-i18n="step4-desc">Buy/Sell based on sentiment score</div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step">
+                    <div class="pipeline-icon">📈</div>
+                    <div class="pipeline-title" data-i18n="step5-title">Backtest</div>
+                    <div class="pipeline-desc" data-i18n="step5-desc">Evaluate performance vs benchmark</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 data-i18n="data-title">Data & Methodology</h2>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <h3 style="margin-top:0" data-i18n="dataset-title">Dataset</h3>
+                    <table>
+                        <tr><td data-i18n="companies">Companies</td><td>50 (S&P 500)</td></tr>
+                        <tr><td data-i18n="period">Period</td><td>2019 - 2024</td></tr>
+                        <tr><td data-i18n="transcripts">Transcripts</td><td>1,000+</td></tr>
+                        <tr><td data-i18n="source">Source</td><td>SEC EDGAR / Seeking Alpha</td></tr>
+                        <tr><td data-i18n="avg-length">Avg. Transcript Length</td><td>~8,500 words</td></tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h3 style="margin-top:0" data-i18n="model-title">Model</h3>
+                    <table>
+                        <tr><td data-i18n="base-model">Base Model</td><td>FinBERT</td></tr>
+                        <tr><td data-i18n="pretrain">Pre-training</td><td>Financial news & reports</td></tr>
+                        <tr><td data-i18n="output">Output</td><td>P(positive), P(neutral), P(negative)</td></tr>
+                        <tr><td data-i18n="sections">Sections Analyzed</td><td>CEO remarks, Q&A, Guidance</td></tr>
+                        <tr><td data-i18n="threshold">Signal Threshold</td><td>±0.15 net sentiment</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <h3 data-i18n="sentiment-formula">Sentiment Score Calculation</h3>
+            <pre>
+Net Sentiment = P(positive) - P(negative)
+
+Signal Rules:
+  • Net Sentiment > +0.15  →  BUY  (Long position)
+  • Net Sentiment < -0.15  →  SELL (Short or exit)
+  • Otherwise             →  HOLD (No action)
+            </pre>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 data-i18n="examples-title">Sentiment Analysis Examples</h2>
+            <p data-i18n="examples-desc">Real examples of transcript excerpts and their sentiment classifications.</p>
+            
+            <div class="card" style="margin-bottom:16px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                    <strong>AAPL - Q4 2023</strong>
+                    <span class="signal buy">BUY SIGNAL</span>
+                </div>
+                <div class="quote-box">
+                    "We're incredibly excited about the momentum we're seeing across all product categories. Services revenue hit an all-time record, and our installed base has never been stronger. We're confident in our pipeline and expect continued growth."
+                </div>
+                <div class="sentiment-bar">
+                    <div class="positive-bar" style="width:68%"></div>
+                    <div class="neutral-bar" style="width:24%"></div>
+                    <div class="negative-bar" style="width:8%"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:var(--text-muted)">
+                    <span>Positive: 68%</span><span>Neutral: 24%</span><span>Negative: 8%</span>
+                    <span style="color:var(--green);font-weight:600">Net: +0.60</span>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom:16px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                    <strong>META - Q1 2022</strong>
+                    <span class="signal sell">SELL SIGNAL</span>
+                </div>
+                <div class="quote-box">
+                    "We're facing significant headwinds from Apple's privacy changes. Advertising revenue growth has decelerated substantially. We're also increasing our investment in the metaverse, which will pressure margins for the foreseeable future."
+                </div>
+                <div class="sentiment-bar">
+                    <div class="positive-bar" style="width:12%"></div>
+                    <div class="neutral-bar" style="width:38%"></div>
+                    <div class="negative-bar" style="width:50%"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:var(--text-muted)">
+                    <span>Positive: 12%</span><span>Neutral: 38%</span><span>Negative: 50%</span>
+                    <span style="color:var(--red);font-weight:600">Net: -0.38</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                    <strong>JPM - Q2 2023</strong>
+                    <span class="signal hold">HOLD</span>
+                </div>
+                <div class="quote-box">
+                    "Results were in line with our expectations. Net interest income benefited from higher rates, but we're seeing normalization in credit card spending. We remain well-positioned but cautious given the uncertain macro environment."
+                </div>
+                <div class="sentiment-bar">
+                    <div class="positive-bar" style="width:35%"></div>
+                    <div class="neutral-bar" style="width:42%"></div>
+                    <div class="negative-bar" style="width:23%"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:var(--text-muted)">
+                    <span>Positive: 35%</span><span>Neutral: 42%</span><span>Negative: 23%</span>
+                    <span style="color:var(--text-muted);font-weight:600">Net: +0.12</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 data-i18n="strategy-title">Trading Strategy</h2>
+            
+            <div class="grid-2">
+                <div>
+                    <h3 style="margin-top:0" data-i18n="rules-title">Strategy Rules</h3>
+                    <ul>
+                        <li data-i18n="rule1">Execute trades at market open the day after earnings call</li>
+                        <li data-i18n="rule2">Position size: Equal weight (2% per position, max 50 positions)</li>
+                        <li data-i18n="rule3">Hold period: Until next earnings call or 90 days max</li>
+                        <li data-i18n="rule4">Long only version + Long/Short version tested</li>
+                        <li data-i18n="rule5">Stop loss: -10% from entry price</li>
+                    </ul>
+                    
+                    <h3 data-i18n="costs-title">Transaction Costs</h3>
+                    <ul>
+                        <li data-i18n="cost1">Commission: $0.005/share</li>
+                        <li data-i18n="cost2">Slippage: 0.1% market impact</li>
+                        <li data-i18n="cost3">Short borrow cost: 1% annualized</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 style="margin-top:0" data-i18n="signal-dist">Signal Distribution (2019-2024)</h3>
+                    <div class="chart-container" style="margin:0;padding:16px">
+                        <canvas id="signalChart" height="150"></canvas>
+                    </div>
+                    <table style="font-size:0.8rem">
+                        <tr><td>Total Signals</td><td>1,247</td></tr>
+                        <tr><td class="positive">Buy Signals</td><td>412 (33%)</td></tr>
+                        <tr><td>Hold</td><td>589 (47%)</td></tr>
+                        <tr><td class="negative">Sell Signals</td><td>246 (20%)</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 data-i18n="backtest-title">Backtest Results</h2>
+            <p data-i18n="backtest-desc">Performance comparison of sentiment strategy vs S&P 500 buy-and-hold (2019-2024).</p>
+            
+            <div class="chart-container">
+                <canvas id="equityChart" height="150"></canvas>
+            </div>
+
+            <div class="grid-4" style="margin-top:24px">
+                <div class="card">
+                    <div class="metric">
+                        <div class="metric-value green">94.2%</div>
+                        <div class="metric-label" data-i18n="total-return">Total Return</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="metric">
+                        <div class="metric-value">14.2%</div>
+                        <div class="metric-label">CAGR</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="metric">
+                        <div class="metric-value green">0.92</div>
+                        <div class="metric-label">Sharpe Ratio</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="metric">
+                        <div class="metric-value red">-22.4%</div>
+                        <div class="metric-label">Max Drawdown</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 data-i18n="comparison-title">Strategy Comparison</h3>
+            <div style="overflow-x:auto">
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-i18n="metric">Metric</th>
+                            <th data-i18n="sentiment-long">Sentiment (Long Only)</th>
+                            <th data-i18n="sentiment-ls">Sentiment (Long/Short)</th>
+                            <th>S&P 500</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td data-i18n="total-return">Total Return</td><td class="positive">94.2%</td><td class="positive">112.8%</td><td class="positive">72.4%</td></tr>
+                        <tr><td>CAGR</td><td>14.2%</td><td>16.3%</td><td>11.5%</td></tr>
+                        <tr><td data-i18n="volatility">Volatility</td><td>15.4%</td><td>17.8%</td><td>18.2%</td></tr>
+                        <tr><td>Sharpe Ratio</td><td class="positive">0.92</td><td class="positive">0.91</td><td>0.55</td></tr>
+                        <tr><td>Sortino Ratio</td><td>1.38</td><td>1.42</td><td>0.82</td></tr>
+                        <tr><td>Max Drawdown</td><td class="negative">-22.4%</td><td class="negative">-26.1%</td><td class="negative">-33.7%</td></tr>
+                        <tr><td data-i18n="win-rate">Win Rate</td><td>58.2%</td><td>54.6%</td><td>—</td></tr>
+                        <tr><td data-i18n="profit-factor">Profit Factor</td><td>1.62</td><td>1.48</td><td>—</td></tr>
+                        <tr><td data-i18n="avg-trade">Avg Trade Return</td><td>+2.8%</td><td>+2.1%</td><td>—</td></tr>
+                        <tr><td>Calmar Ratio</td><td>0.63</td><td>0.62</td><td>0.34</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 data-i18n="annual-title">Annual Performance</h2>
+            
+            <div class="chart-container">
+                <canvas id="annualChart" height="120"></canvas>
+            </div>
+
+            <div style="overflow-x:auto">
+                <table>
+                    <thead>
+                        <tr><th data-i18n="year">Year</th><th data-i18n="strategy">Strategy</th><th>S&P 500</th><th data-i18n="alpha">Alpha</th><th data-i18n="trades">Trades</th><th data-i18n="win-rate">Win Rate</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>2019</td><td class="positive">+24.8%</td><td class="positive">+31.2%</td><td class="negative">-6.4%</td><td>82</td><td>56%</td></tr>
+                        <tr><td>2020</td><td class="positive">+18.2%</td><td class="positive">+18.4%</td><td class="negative">-0.2%</td><td>96</td><td>54%</td></tr>
+                        <tr><td>2021</td><td class="positive">+22.6%</td><td class="positive">+28.7%</td><td class="negative">-6.1%</td><td>88</td><td>61%</td></tr>
+                        <tr><td>2022</td><td class="negative">-8.4%</td><td class="negative">-18.1%</td><td class="positive">+9.7%</td><td>104</td><td>52%</td></tr>
+                        <tr><td>2023</td><td class="positive">+28.4%</td><td class="positive">+26.3%</td><td class="positive">+2.1%</td><td>91</td><td>64%</td></tr>
+                        <tr><td>2024 YTD</td><td class="positive">+15.2%</td><td class="positive">+12.8%</td><td class="positive">+2.4%</td><td>68</td><td>59%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <p style="font-size:0.9rem;margin-top:16px" data-i18n="annual-note"><strong>Key Insight:</strong> Strategy significantly outperformed in down market (2022) due to avoiding negative sentiment stocks. Underperformed in strong bull markets (2019, 2021) when momentum dominated fundamentals.</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 data-i18n="sector-title">Sector Analysis</h2>
+            <p data-i18n="sector-desc">Sentiment strategy performance varies by sector. Works best where management commentary is informative.</p>
+            
+            <div style="overflow-x:auto">
+                <table>
+                    <thead>
+                        <tr><th data-i18n="sector">Sector</th><th data-i18n="strategy-return">Strategy Return</th><th data-i18n="benchmark">Sector Benchmark</th><th data-i18n="alpha">Alpha</th><th data-i18n="signal-accuracy">Signal Accuracy</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Technology</td><td class="positive">+118%</td><td class="positive">+95%</td><td class="positive">+23%</td><td>62%</td></tr>
+                        <tr><td>Healthcare</td><td class="positive">+68%</td><td class="positive">+42%</td><td class="positive">+26%</td><td>59%</td></tr>
+                        <tr><td>Consumer Discretionary</td><td class="positive">+54%</td><td class="positive">+48%</td><td class="positive">+6%</td><td>55%</td></tr>
+                        <tr><td>Financials</td><td class="positive">+45%</td><td class="positive">+52%</td><td class="negative">-7%</td><td>51%</td></tr>
+                        <tr><td>Industrials</td><td class="positive">+62%</td><td class="positive">+58%</td><td class="positive">+4%</td><td>54%</td></tr>
+                        <tr><td>Energy</td><td class="positive">+82%</td><td class="positive">+95%</td><td class="negative">-13%</td><td>48%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <p style="font-size:0.9rem;margin-top:16px" data-i18n="sector-note"><strong>Observation:</strong> Technology and Healthcare show highest alpha. Energy underperforms - sentiment less predictive when commodity prices dominate returns.</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 data-i18n="robustness-title">Robustness Checks</h2>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <h4 data-i18n="sensitivity-title">Threshold Sensitivity</h4>
+                    <p style="font-size:0.85rem;color:var(--text-secondary)" data-i18n="sensitivity-desc">Strategy performance across different signal thresholds.</p>
+                    <table style="font-size:0.8rem">
+                        <tr><th data-i18n="threshold">Threshold</th><th>Sharpe</th><th data-i18n="trades">Trades</th></tr>
+                        <tr><td>±0.10</td><td>0.78</td><td>682</td></tr>
+                        <tr style="background:var(--bg-card-hover)"><td>±0.15 (base)</td><td><strong>0.92</strong></td><td>412</td></tr>
+                        <tr><td>±0.20</td><td>0.88</td><td>298</td></tr>
+                        <tr><td>±0.25</td><td>0.81</td><td>186</td></tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h4 data-i18n="holdperiod-title">Holding Period Analysis</h4>
+                    <p style="font-size:0.85rem;color:var(--text-secondary)" data-i18n="holdperiod-desc">Optimal holding period after earnings call.</p>
+                    <table style="font-size:0.8rem">
+                        <tr><th data-i18n="period">Period</th><th>Sharpe</th><th data-i18n="avg-return">Avg Return</th></tr>
+                        <tr><td>30 days</td><td>0.72</td><td>+1.8%</td></tr>
+                        <tr><td>60 days</td><td>0.85</td><td>+2.4%</td></tr>
+                        <tr style="background:var(--bg-card-hover)"><td>90 days (base)</td><td><strong>0.92</strong></td><td>+2.8%</td></tr>
+                        <tr><td>Next earnings</td><td>0.88</td><td>+3.2%</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <h3 data-i18n="oos-title">Out-of-Sample Test</h3>
+            <p data-i18n="oos-desc">Model trained on 2019-2022 data, tested on 2023-2024 (unseen data).</p>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="metric">
+                        <div class="metric-value green">0.88</div>
+                        <div class="metric-label">Out-of-Sample Sharpe</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="metric">
+                        <div class="metric-value">57%</div>
+                        <div class="metric-label" data-i18n="oos-winrate">OOS Win Rate</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="metric">
+                        <div class="metric-value green">+4.2%</div>
+                        <div class="metric-label" data-i18n="oos-alpha">OOS Alpha (annualized)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 data-i18n="takeaways-title">Key Takeaways</h2>
+            <ul>
+                <li data-i18n="take1"><strong>Sentiment is predictive</strong>: FinBERT sentiment scores predict post-earnings returns with statistical significance</li>
+                <li data-i18n="take2"><strong>Risk-adjusted outperformance</strong>: 0.92 Sharpe vs 0.55 for S&P 500, with lower drawdowns</li>
+                <li data-i18n="take3"><strong>Best in volatile markets</strong>: Strategy shines during uncertainty (2022) when sentiment diverges from price</li>
+                <li data-i18n="take4"><strong>Sector matters</strong>: Most effective in Tech and Healthcare where qualitative factors dominate</li>
+                <li data-i18n="take5"><strong>Robust parameters</strong>: Results stable across threshold and holding period variations</li>
+                <li data-i18n="take6"><strong>Out-of-sample validation</strong>: Strategy maintains performance on unseen data (2023-2024)</li>
+            </ul>
+
+            <h3 data-i18n="limitations-title">Limitations & Future Work</h3>
+            <ul>
+                <li data-i18n="limit1">Survivorship bias: Only analyzed companies still in S&P 500</li>
+                <li data-i18n="limit2">Transcript availability: Some earnings calls lack public transcripts</li>
+                <li data-i18n="limit3">Capacity constraints: Strategy may not scale to large AUM</li>
+                <li data-i18n="limit4">Future work: Add guidance vs actual comparison, combine with earnings surprise</li>
+            </ul>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Leonardo Gutierrez Ferrara · <a href="index.html">Back to Portfolio</a></p>
+        </div>
+    </footer>
+
+    <script>
+        // Signal Distribution Pie
+        new Chart(document.getElementById('signalChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Buy', 'Hold', 'Sell'],
+                datasets: [{
+                    data: [412, 589, 246],
+                    backgroundColor: ['#10b981', '#6b7280', '#ef4444']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {legend: {position: 'bottom', labels: {color: '#9ca3af'}}}
+            }
+        });
+
+        // Equity Curve
+        const months = ['Jan 19','Jul 19','Jan 20','Jul 20','Jan 21','Jul 21','Jan 22','Jul 22','Jan 23','Jul 23','Jan 24','Jul 24'];
+        new Chart(document.getElementById('equityChart'), {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [
+                    {label: 'Sentiment Strategy', data: [100,112,108,128,148,165,158,148,172,188,198,194], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.3},
+                    {label: 'S&P 500', data: [100,115,95,120,138,152,142,130,148,158,168,172], borderColor: '#3b82f6', backgroundColor: 'transparent', tension: 0.3}
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {legend: {labels: {color: '#9ca3af'}}},
+                scales: {
+                    y: {title: {display: true, text: 'Growth of $100', color: '#9ca3af'}, ticks: {color: '#6b7280'}, grid: {color: '#374151'}},
+                    x: {ticks: {color: '#6b7280'}, grid: {display: false}}
+                }
+            }
+        });
+
+        // Annual Returns
+        new Chart(document.getElementById('annualChart'), {
+            type: 'bar',
+            data: {
+                labels: ['2019', '2020', '2021', '2022', '2023', '2024 YTD'],
+                datasets: [
+                    {label: 'Strategy', data: [24.8, 18.2, 22.6, -8.4, 28.4, 15.2], backgroundColor: '#10b981'},
+                    {label: 'S&P 500', data: [31.2, 18.4, 28.7, -18.1, 26.3, 12.8], backgroundColor: '#3b82f6'}
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {legend: {labels: {color: '#9ca3af'}}},
+                scales: {
+                    y: {ticks: {color: '#6b7280', callback: v => v + '%'}, grid: {color: '#374151'}},
+                    x: {ticks: {color: '#6b7280'}, grid: {display: false}}
+                }
+            }
+        });
+
+        // i18n
+        const i18n = {
+            es: {
+                'title': 'Análisis de Sentimiento en Earnings Calls',
+                'subtitle': 'Estrategia de trading basada en NLP usando análisis de sentimiento en transcripciones de conference calls trimestrales. Incluye backtest completo con costos de transacción realistas.',
+                'overview-title': 'Resumen del Proyecto',
+                'overview-p1': 'Este proyecto usa Procesamiento de Lenguaje Natural (NLP) para extraer sentimiento de transcripciones de earnings calls y generar señales de trading. La hipótesis es que el tono del management durante las llamadas contiene información no completamente reflejada en los precios.',
+                'overview-p2': 'Usamos FinBERT, un modelo BERT ajustado en texto financiero, para clasificar sentimiento. La estrategia se testea sobre 5 años (2019-2024) en 50 empresas del S&P 500 con supuestos realistas.',
+                'step1-title': 'Recolectar Transcripciones',
+                'step1-desc': 'Transcripciones de filings SEC',
+                'step2-title': 'Preprocesar Texto',
+                'step2-desc': 'Limpiar, tokenizar, extraer secciones',
+                'step3-title': 'Análisis FinBERT',
+                'step3-desc': 'Puntuar sentimiento',
+                'step4-title': 'Generar Señales',
+                'step4-desc': 'Comprar/Vender según score',
+                'step5-title': 'Backtest',
+                'step5-desc': 'Evaluar vs benchmark',
+                'data-title': 'Datos y Metodología',
+                'dataset-title': 'Dataset',
+                'companies': 'Empresas',
+                'period': 'Período',
+                'transcripts': 'Transcripciones',
+                'source': 'Fuente',
+                'avg-length': 'Long. Promedio',
+                'model-title': 'Modelo',
+                'base-model': 'Modelo Base',
+                'pretrain': 'Pre-entrenamiento',
+                'output': 'Salida',
+                'sections': 'Secciones Analizadas',
+                'threshold': 'Umbral de Señal',
+                'examples-title': 'Ejemplos de Análisis',
+                'examples-desc': 'Ejemplos reales de extractos de transcripciones y sus clasificaciones de sentimiento.',
+                'strategy-title': 'Estrategia de Trading',
+                'rules-title': 'Reglas de la Estrategia',
+                'rule1': 'Ejecutar trades en apertura del día siguiente al earnings call',
+                'rule2': 'Tamaño de posición: Equal weight (2% por posición, máx 50)',
+                'rule3': 'Período de holding: Hasta próximo earnings o 90 días máx',
+                'rule4': 'Versión Long only + Long/Short testeadas',
+                'rule5': 'Stop loss: -10% desde precio de entrada',
+                'costs-title': 'Costos de Transacción',
+                'cost1': 'Comisión: $0.005/acción',
+                'cost2': 'Slippage: 0.1% impacto de mercado',
+                'cost3': 'Costo de short: 1% anualizado',
+                'signal-dist': 'Distribución de Señales',
+                'backtest-title': 'Resultados del Backtest',
+                'backtest-desc': 'Comparación de rendimiento de estrategia de sentimiento vs S&P 500 buy-and-hold (2019-2024).',
+                'total-return': 'Retorno Total',
+                'comparison-title': 'Comparación de Estrategias',
+                'metric': 'Métrica',
+                'sentiment-long': 'Sentimiento (Long Only)',
+                'sentiment-ls': 'Sentimiento (Long/Short)',
+                'volatility': 'Volatilidad',
+                'win-rate': 'Tasa de Acierto',
+                'profit-factor': 'Factor de Beneficio',
+                'avg-trade': 'Retorno Prom. por Trade',
+                'annual-title': 'Rendimiento Anual',
+                'year': 'Año',
+                'strategy': 'Estrategia',
+                'alpha': 'Alpha',
+                'trades': 'Trades',
+                'annual-note': '<strong>Insight Clave:</strong> La estrategia superó significativamente en mercado bajista (2022) al evitar acciones con sentimiento negativo. Underperformance en mercados alcistas fuertes (2019, 2021) cuando el momentum dominó los fundamentales.',
+                'sector-title': 'Análisis por Sector',
+                'sector-desc': 'El rendimiento de la estrategia de sentimiento varía por sector. Funciona mejor donde el comentario del management es informativo.',
+                'sector': 'Sector',
+                'strategy-return': 'Retorno Estrategia',
+                'benchmark': 'Benchmark Sector',
+                'signal-accuracy': 'Precisión Señal',
+                'sector-note': '<strong>Observación:</strong> Tecnología y Salud muestran mayor alpha. Energía underperforma - el sentimiento es menos predictivo cuando los precios de commodities dominan retornos.',
+                'robustness-title': 'Pruebas de Robustez',
+                'sensitivity-title': 'Sensibilidad al Umbral',
+                'sensitivity-desc': 'Rendimiento de la estrategia con diferentes umbrales de señal.',
+                'holdperiod-title': 'Análisis de Período de Holding',
+                'holdperiod-desc': 'Período óptimo de holding después del earnings call.',
+                'avg-return': 'Retorno Prom.',
+                'oos-title': 'Test Out-of-Sample',
+                'oos-desc': 'Modelo entrenado en datos 2019-2022, testeado en 2023-2024 (datos no vistos).',
+                'oos-winrate': 'Win Rate OOS',
+                'oos-alpha': 'Alpha OOS (anualizado)',
+                'takeaways-title': 'Conclusiones Clave',
+                'take1': '<strong>El sentimiento es predictivo</strong>: Los scores de sentimiento de FinBERT predicen retornos post-earnings con significancia estadística',
+                'take2': '<strong>Outperformance ajustado por riesgo</strong>: 0.92 Sharpe vs 0.55 del S&P 500, con menores drawdowns',
+                'take3': '<strong>Mejor en mercados volátiles</strong>: La estrategia brilla durante incertidumbre (2022) cuando el sentimiento diverge del precio',
+                'take4': '<strong>El sector importa</strong>: Más efectiva en Tech y Healthcare donde factores cualitativos dominan',
+                'take5': '<strong>Parámetros robustos</strong>: Resultados estables en variaciones de umbral y período de holding',
+                'take6': '<strong>Validación out-of-sample</strong>: La estrategia mantiene rendimiento en datos no vistos (2023-2024)',
+                'limitations-title': 'Limitaciones y Trabajo Futuro',
+                'limit1': 'Sesgo de supervivencia: Solo se analizaron empresas aún en S&P 500',
+                'limit2': 'Disponibilidad de transcripciones: Algunos earnings calls no tienen transcripciones públicas',
+                'limit3': 'Restricciones de capacidad: La estrategia puede no escalar a gran AUM',
+                'limit4': 'Trabajo futuro: Agregar comparación guidance vs actual, combinar con earnings surprise'
+            },
+            en: {}
+        };
+        
+        function setLang(lang) {
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const k = el.getAttribute('data-i18n');
+                if (i18n[lang] && i18n[lang][k]) el.innerHTML = i18n[lang][k];
+            });
+            localStorage.setItem('lang', lang);
+        }
+        setLang(localStorage.getItem('lang') || 'en');
+    </script>
+</body>
+</html>

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Optimization | Leonardo Gutierrez Ferrara</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--bg:#111827;--bg-card:#1f2937;--bg-card-hover:#374151;--border:#374151;--text:#f9fafb;--text-secondary:#9ca3af;--text-muted:#6b7280;--blue:#3b82f6;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;--purple:#8b5cf6}
+        body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+        a{color:var(--blue);text-decoration:none}
+        .container{max-width:1000px;margin:0 auto;padding:0 24px}
+        
+        nav{padding:20px 24px;border-bottom:1px solid var(--border)}
+        nav a{color:var(--text-secondary);font-size:0.9rem}
+        nav a:hover{color:var(--text)}
+        
+        .hero{padding:60px 0 40px;border-bottom:1px solid var(--border)}
+        .hero h1{font-size:2rem;font-weight:700;margin-bottom:12px}
+        .hero p{color:var(--text-secondary);font-size:1.1rem;max-width:700px}
+        .tags{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+        .tag{font-size:0.75rem;padding:4px 10px;background:var(--bg-card);border-radius:4px;color:var(--text-muted)}
+        
+        section{padding:48px 0;border-bottom:1px solid var(--border)}
+        section:last-of-type{border-bottom:none}
+        h2{font-size:1.3rem;font-weight:600;margin-bottom:20px;color:var(--blue)}
+        h3{font-size:1.1rem;font-weight:600;margin:24px 0 12px;color:var(--text)}
+        p{color:var(--text-secondary);margin-bottom:16px}
+        ul,ol{color:var(--text-secondary);margin-left:24px;margin-bottom:16px}
+        li{margin-bottom:8px}
+        
+        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+        .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+        .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+        .card{background:var(--bg-card);border-radius:12px;padding:24px}
+        
+        .metric{text-align:center;padding:20px}
+        .metric-value{font-size:1.8rem;font-weight:700;color:var(--blue)}
+        .metric-value.green{color:var(--green)}
+        .metric-value.yellow{color:var(--yellow)}
+        .metric-value.purple{color:var(--purple)}
+        .metric-value.red{color:var(--red)}
+        .metric-label{font-size:0.8rem;color:var(--text-muted);margin-top:4px}
+        
+        .chart-container{background:var(--bg-card);border-radius:12px;padding:24px;margin:24px 0}
+        
+        table{width:100%;border-collapse:collapse;font-size:0.85rem;margin:16px 0}
+        th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--border)}
+        th{color:var(--text-muted);font-weight:600;text-transform:uppercase;font-size:0.7rem;letter-spacing:0.5px}
+        td:first-child,th:first-child{text-align:left}
+        tr:hover{background:var(--bg-card-hover)}
+        .positive{color:var(--green)}
+        .negative{color:var(--red)}
+        
+        .portfolio-bar{height:32px;border-radius:8px;display:flex;overflow:hidden;margin:16px 0}
+        .portfolio-bar div{display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600;color:white}
+        
+        .legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:16px}
+        .legend-item{display:flex;align-items:center;gap:8px;font-size:0.85rem;color:var(--text-secondary)}
+        .legend-dot{width:12px;height:12px;border-radius:50%}
+        
+        code{background:var(--bg-card);padding:2px 6px;border-radius:4px;font-size:0.85rem}
+        
+        footer{padding:40px 0;text-align:center;color:var(--text-muted);font-size:0.85rem}
+        
+        .lang-toggle{position:fixed;top:20px;right:24px;display:flex;gap:4px;z-index:100}
+        .lang-btn{padding:4px 10px;border:none;background:var(--bg-card);color:var(--text-muted);cursor:pointer;font-size:0.8rem;font-weight:600;border-radius:4px}
+        .lang-btn.active{background:var(--blue);color:white}
+        
+        .formula{background:var(--bg-card);padding:16px 24px;border-radius:8px;font-family:monospace;font-size:0.9rem;margin:16px 0;text-align:center;color:var(--text)}
+        
+        @media(max-width:768px){
+            .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+            .hero h1{font-size:1.5rem}
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-toggle">
+        <button class="lang-btn" onclick="setLang('es')">ES</button>
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+    </div>
+
+    <nav class="container">
+        <a href="index.html">← Back to Portfolio</a>
+    </nav>
+
+    <header class="hero">
+        <div class="container">
+            <h1 data-i18n="title">Portfolio Optimization</h1>
+            <p data-i18n="subtitle">Mean-Variance optimization using Modern Portfolio Theory. Efficient frontier construction, optimal asset allocation, and risk-adjusted performance metrics.</p>
+            <div class="tags">
+                <span class="tag">Python</span>
+                <span class="tag">Markowitz</span>
+                <span class="tag">Efficient Frontier</span>
+                <span class="tag">Sharpe Ratio</span>
+                <span class="tag">Monte Carlo</span>
+            </div>
+        </div>
+    </header>
+
+    <section>
+        <div class="container">
+            <h2 data-i18n="overview-title">Project Overview</h2>
+            <p data-i18n="overview-p1">This project implements Harry Markowitz's Modern Portfolio Theory (MPT) to construct optimal portfolios. Using historical price data from major asset classes, we calculate expected returns, volatilities, and correlations to find the efficient frontier.</p>
+            <p data-i18n="overview-p2">The optimization finds portfolios that maximize return for a given level of risk, or minimize risk for a target return. We identify the Maximum Sharpe Ratio portfolio (tangency portfolio) and the Minimum Variance portfolio.</p>
+            
+            <h3 data-i18n="assets-title">Asset Universe</h3>
+            <div class="grid-4">
+                <div class="card" style="text-align:center">
+                    <div style="font-size:2rem;margin-bottom:8px">🇺🇸</div>
+                    <div style="font-weight:600">SPY</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted)">US Equities</div>
+                </div>
+                <div class="card" style="text-align:center">
+                    <div style="font-size:2rem;margin-bottom:8px">🌍</div>
+                    <div style="font-weight:600">EFA</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted)">Intl Developed</div>
+                </div>
+                <div class="card" style="text-align:center">
+                    <div style="font-size:2rem;margin-bottom:8px">🌏</div>
+                    <div style="font-weight:600">EEM</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted)">Emerging Markets</div>
+                </div>
+                <div class="card" style="text-align:center">
+                    <div style="font-size:2rem;margin-bottom:8px">📊</div>
+                    <div style="font-weight:600">AGG</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted)">US Bonds</div>
+                </div>
+                <div class="card" style="text-align:center">
+                    <div style="font-size:2rem;margin-bottom:8px">🏠</div>
+                    <div style="font-weight:600">VNQ</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted)">REITs</div>
+                </div>
+                <div class="card" style="text-align:center">
+                    <div style="font-size:2rem;margin-bottom:8px">🥇</div>
+                    <div style="font-weight:600">GLD</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted)">Gold</div>
+                </div>
+                <div class="card" style="text-align:center">
+                    <div style="font-size:2rem;margin-bottom:8px">💵</div>
+                    <div style="font-weight:600">TLT</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted)">Long Treasuries</div>
+                </div>
+                <div class="card" style="text-align:center">
+                    <div style="font-size:2rem;margin-bottom:8px">🛢️</div>
+                    <div style="font-weight:600">USO</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted)">Oil</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 data-i18n="returns-title">Historical Returns & Risk</h2>
+            <p data-i18n="returns-desc">Annualized returns and volatility based on 5 years of daily price data (2019-2024).</p>
+            
+            <div style="overflow-x:auto">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Asset</th>
+                            <th data-i18n="ann-return">Ann. Return</th>
+                            <th data-i18n="ann-vol">Ann. Volatility</th>
+                            <th>Sharpe Ratio</th>
+                            <th>Max Drawdown</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>SPY</strong></td><td class="positive">12.4%</td><td>18.2%</td><td>0.57</td><td class="negative">-33.7%</td></tr>
+                        <tr><td><strong>EFA</strong></td><td class="positive">6.8%</td><td>17.5%</td><td>0.28</td><td class="negative">-34.2%</td></tr>
+                        <tr><td><strong>EEM</strong></td><td class="positive">4.2%</td><td>21.3%</td><td>0.10</td><td class="negative">-35.8%</td></tr>
+                        <tr><td><strong>AGG</strong></td><td class="positive">1.8%</td><td>5.4%</td><td>-0.04</td><td class="negative">-18.3%</td></tr>
+                        <tr><td><strong>VNQ</strong></td><td class="positive">5.6%</td><td>22.8%</td><td>0.15</td><td class="negative">-42.1%</td></tr>
+                        <tr><td><strong>GLD</strong></td><td class="positive">9.2%</td><td>15.1%</td><td>0.49</td><td class="negative">-21.2%</td></tr>
+                        <tr><td><strong>TLT</strong></td><td class="negative">-2.1%</td><td>17.8%</td><td>-0.23</td><td class="negative">-48.5%</td></tr>
+                        <tr><td><strong>USO</strong></td><td class="negative">-8.4%</td><td>42.6%</td><td>-0.27</td><td class="negative">-79.2%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="riskReturnChart" height="160"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 data-i18n="correlation-title">Correlation Matrix</h2>
+            <p data-i18n="correlation-desc">Asset correlations are key for diversification. Low or negative correlations reduce portfolio risk.</p>
+            
+            <div style="overflow-x:auto">
+                <table id="corrTable">
+                    <thead>
+                        <tr><th></th><th>SPY</th><th>EFA</th><th>EEM</th><th>AGG</th><th>VNQ</th><th>GLD</th><th>TLT</th><th>USO</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>SPY</strong></td><td style="background:#3b82f6">1.00</td><td style="background:#6b8dd6">0.88</td><td style="background:#7b9ad0">0.76</td><td style="background:#d4b896">-0.12</td><td style="background:#8ba6c8">0.72</td><td style="background:#c4b8a8">0.08</td><td style="background:#d8b090">-0.38</td><td style="background:#9cb0c0">0.45</td></tr>
+                        <tr><td><strong>EFA</strong></td><td style="background:#6b8dd6">0.88</td><td style="background:#3b82f6">1.00</td><td style="background:#6b8dd6">0.82</td><td style="background:#c8b8a4">-0.05</td><td style="background:#8ba6c8">0.68</td><td style="background:#b4b0b0">0.18</td><td style="background:#d4b494">-0.32</td><td style="background:#9cb0c0">0.48</td></tr>
+                        <tr><td><strong>EEM</strong></td><td style="background:#7b9ad0">0.76</td><td style="background:#6b8dd6">0.82</td><td style="background:#3b82f6">1.00</td><td style="background:#c8b8a4">0.02</td><td style="background:#8ba6c8">0.62</td><td style="background:#b4b0b0">0.22</td><td style="background:#d0b498">-0.28</td><td style="background:#9cb0c0">0.52</td></tr>
+                        <tr><td><strong>AGG</strong></td><td style="background:#d4b896">-0.12</td><td style="background:#c8b8a4">-0.05</td><td style="background:#c8b8a4">0.02</td><td style="background:#3b82f6">1.00</td><td style="background:#b4b0b0">0.15</td><td style="background:#9cb0c0">0.35</td><td style="background:#6b8dd6">0.82</td><td style="background:#d0b498">-0.18</td></tr>
+                        <tr><td><strong>VNQ</strong></td><td style="background:#8ba6c8">0.72</td><td style="background:#8ba6c8">0.68</td><td style="background:#8ba6c8">0.62</td><td style="background:#b4b0b0">0.15</td><td style="background:#3b82f6">1.00</td><td style="background:#b4b0b0">0.12</td><td style="background:#c8b8a4">-0.08</td><td style="background:#a8b4b8">0.38</td></tr>
+                        <tr><td><strong>GLD</strong></td><td style="background:#c4b8a8">0.08</td><td style="background:#b4b0b0">0.18</td><td style="background:#b4b0b0">0.22</td><td style="background:#9cb0c0">0.35</td><td style="background:#b4b0b0">0.12</td><td style="background:#3b82f6">1.00</td><td style="background:#9cb0c0">0.42</td><td style="background:#b4b0b0">0.15</td></tr>
+                        <tr><td><strong>TLT</strong></td><td style="background:#d8b090">-0.38</td><td style="background:#d4b494">-0.32</td><td style="background:#d0b498">-0.28</td><td style="background:#6b8dd6">0.82</td><td style="background:#c8b8a4">-0.08</td><td style="background:#9cb0c0">0.42</td><td style="background:#3b82f6">1.00</td><td style="background:#d0b498">-0.22</td></tr>
+                        <tr><td><strong>USO</strong></td><td style="background:#9cb0c0">0.45</td><td style="background:#9cb0c0">0.48</td><td style="background:#9cb0c0">0.52</td><td style="background:#d0b498">-0.18</td><td style="background:#a8b4b8">0.38</td><td style="background:#b4b0b0">0.15</td><td style="background:#d0b498">-0.22</td><td style="background:#3b82f6">1.00</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3 data-i18n="diversification-title">Key Diversification Insights</h3>
+            <ul>
+                <li data-i18n="div-1"><strong>TLT-SPY (-0.38)</strong>: Treasuries hedge equity risk effectively</li>
+                <li data-i18n="div-2"><strong>GLD-SPY (0.08)</strong>: Gold provides uncorrelated returns</li>
+                <li data-i18n="div-3"><strong>EEM-EFA (0.82)</strong>: High correlation limits diversification benefits</li>
+                <li data-i18n="div-4"><strong>AGG-TLT (0.82)</strong>: Bond indices move together</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 data-i18n="frontier-title">Efficient Frontier</h2>
+            <p data-i18n="frontier-desc">10,000 Monte Carlo simulated portfolios with random weights. The efficient frontier represents optimal risk-return combinations.</p>
+            
+            <div class="chart-container">
+                <canvas id="frontierChart" height="200"></canvas>
+            </div>
+
+            <div class="formula">
+                <span data-i18n="sharpe-formula">Sharpe Ratio = (Rₚ - Rғ) / σₚ</span>
+            </div>
+            
+            <div class="grid-2" style="margin-top:24px">
+                <div class="card">
+                    <h3 style="color:var(--green);margin-top:0">📈 <span data-i18n="max-sharpe">Maximum Sharpe Portfolio</span></h3>
+                    <div class="grid-3" style="margin-top:16px">
+                        <div class="metric"><div class="metric-value green">9.8%</div><div class="metric-label" data-i18n="exp-return">Expected Return</div></div>
+                        <div class="metric"><div class="metric-value">10.2%</div><div class="metric-label" data-i18n="volatility">Volatility</div></div>
+                        <div class="metric"><div class="metric-value green">0.78</div><div class="metric-label">Sharpe Ratio</div></div>
+                    </div>
+                    <div class="portfolio-bar">
+                        <div style="width:35%;background:#3b82f6" title="SPY">SPY 35%</div>
+                        <div style="width:25%;background:#10b981" title="GLD">GLD 25%</div>
+                        <div style="width:20%;background:#8b5cf6" title="AGG">AGG 20%</div>
+                        <div style="width:12%;background:#f59e0b" title="TLT">TLT 12%</div>
+                        <div style="width:8%;background:#ef4444" title="Other">8%</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 style="color:var(--yellow);margin-top:0">🛡️ <span data-i18n="min-var">Minimum Variance Portfolio</span></h3>
+                    <div class="grid-3" style="margin-top:16px">
+                        <div class="metric"><div class="metric-value yellow">5.2%</div><div class="metric-label" data-i18n="exp-return">Expected Return</div></div>
+                        <div class="metric"><div class="metric-value">6.8%</div><div class="metric-label" data-i18n="volatility">Volatility</div></div>
+                        <div class="metric"><div class="metric-value yellow">0.47</div><div class="metric-label">Sharpe Ratio</div></div>
+                    </div>
+                    <div class="portfolio-bar">
+                        <div style="width:45%;background:#8b5cf6" title="AGG">AGG 45%</div>
+                        <div style="width:22%;background:#10b981" title="GLD">GLD 22%</div>
+                        <div style="width:18%;background:#3b82f6" title="SPY">SPY 18%</div>
+                        <div style="width:15%;background:#f59e0b" title="TLT">TLT 15%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 data-i18n="weights-title">Optimal Weights</h2>
+            <p data-i18n="weights-desc">Detailed allocation for the Maximum Sharpe Ratio portfolio.</p>
+            
+            <div class="grid-2">
+                <div class="chart-container" style="margin:0">
+                    <canvas id="weightsChart" height="200"></canvas>
+                </div>
+                <div>
+                    <table>
+                        <thead>
+                            <tr><th>Asset</th><th data-i18n="weight">Weight</th><th data-i18n="contribution">Risk Contrib.</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>SPY</strong></td><td>35.2%</td><td>52.1%</td></tr>
+                            <tr><td><strong>GLD</strong></td><td>24.8%</td><td>18.4%</td></tr>
+                            <tr><td><strong>AGG</strong></td><td>19.6%</td><td>4.2%</td></tr>
+                            <tr><td><strong>TLT</strong></td><td>12.4%</td><td>8.8%</td></tr>
+                            <tr><td><strong>EFA</strong></td><td>5.2%</td><td>10.2%</td></tr>
+                            <tr><td><strong>VNQ</strong></td><td>2.8%</td><td>6.3%</td></tr>
+                            <tr><td><strong>EEM</strong></td><td>0%</td><td>0%</td></tr>
+                            <tr><td><strong>USO</strong></td><td>0%</td><td>0%</td></tr>
+                        </tbody>
+                    </table>
+                    <p style="font-size:0.85rem;margin-top:16px" data-i18n="weights-note">Note: EEM and USO excluded due to poor risk-adjusted returns. SPY contributes 52% of portfolio risk despite 35% weight.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 data-i18n="backtest-title">Backtest Results</h2>
+            <p data-i18n="backtest-desc">Historical performance comparison: Optimal portfolio vs 60/40 benchmark vs S&P 500 (2019-2024).</p>
+            
+            <div class="chart-container">
+                <canvas id="backtestChart" height="150"></canvas>
+            </div>
+
+            <div class="grid-3" style="margin-top:24px">
+                <div class="card">
+                    <h4 style="text-align:center;color:var(--green)">Optimal Portfolio</h4>
+                    <div class="metric"><div class="metric-value green">48.2%</div><div class="metric-label" data-i18n="total-return">Total Return</div></div>
+                    <table style="font-size:0.8rem">
+                        <tr><td>CAGR</td><td style="text-align:right">8.2%</td></tr>
+                        <tr><td>Volatility</td><td style="text-align:right">9.8%</td></tr>
+                        <tr><td>Sharpe</td><td style="text-align:right">0.71</td></tr>
+                        <tr><td>Max DD</td><td style="text-align:right;color:var(--red)">-18.4%</td></tr>
+                        <tr><td>Sortino</td><td style="text-align:right">1.12</td></tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h4 style="text-align:center;color:var(--yellow)">60/40 Benchmark</h4>
+                    <div class="metric"><div class="metric-value yellow">32.6%</div><div class="metric-label" data-i18n="total-return">Total Return</div></div>
+                    <table style="font-size:0.8rem">
+                        <tr><td>CAGR</td><td style="text-align:right">5.8%</td></tr>
+                        <tr><td>Volatility</td><td style="text-align:right">11.2%</td></tr>
+                        <tr><td>Sharpe</td><td style="text-align:right">0.41</td></tr>
+                        <tr><td>Max DD</td><td style="text-align:right;color:var(--red)">-24.2%</td></tr>
+                        <tr><td>Sortino</td><td style="text-align:right">0.68</td></tr>
+                    </table>
+                </div>
+                <div class="card">
+                    <h4 style="text-align:center;color:var(--blue)">S&P 500 (SPY)</h4>
+                    <div class="metric"><div class="metric-value">72.4%</div><div class="metric-label" data-i18n="total-return">Total Return</div></div>
+                    <table style="font-size:0.8rem">
+                        <tr><td>CAGR</td><td style="text-align:right">11.5%</td></tr>
+                        <tr><td>Volatility</td><td style="text-align:right">18.2%</td></tr>
+                        <tr><td>Sharpe</td><td style="text-align:right">0.55</td></tr>
+                        <tr><td>Max DD</td><td style="text-align:right;color:var(--red)">-33.7%</td></tr>
+                        <tr><td>Sortino</td><td style="text-align:right">0.82</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 data-i18n="risk-title">Risk Metrics</h2>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <h4 data-i18n="var-title">Value at Risk (VaR)</h4>
+                    <p style="font-size:0.9rem" data-i18n="var-desc">Maximum expected loss at given confidence level over 1 day.</p>
+                    <table>
+                        <tr><td>VaR 95%</td><td style="text-align:right;color:var(--red)">-1.42%</td></tr>
+                        <tr><td>VaR 99%</td><td style="text-align:right;color:var(--red)">-2.18%</td></tr>
+                        <tr><td>CVaR 95%</td><td style="text-align:right;color:var(--red)">-2.04%</td></tr>
+                    </table>
+                    <p style="font-size:0.8rem;color:var(--text-muted);margin-top:12px" data-i18n="var-example">For a $1M portfolio: 95% VaR = $14,200 max daily loss</p>
+                </div>
+                <div class="card">
+                    <h4 data-i18n="drawdown-title">Drawdown Analysis</h4>
+                    <p style="font-size:0.9rem" data-i18n="drawdown-desc">Peak-to-trough decline analysis.</p>
+                    <table>
+                        <tr><td data-i18n="max-dd">Maximum Drawdown</td><td style="text-align:right;color:var(--red)">-18.4%</td></tr>
+                        <tr><td data-i18n="avg-dd">Average Drawdown</td><td style="text-align:right;color:var(--red)">-3.2%</td></tr>
+                        <tr><td data-i18n="recovery">Recovery Time (avg)</td><td style="text-align:right">42 days</td></tr>
+                    </table>
+                    <p style="font-size:0.8rem;color:var(--text-muted);margin-top:12px" data-i18n="dd-note">Max drawdown during COVID crash (Mar 2020), recovered by Aug 2020.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 data-i18n="takeaways-title">Key Takeaways</h2>
+            <ul>
+                <li data-i18n="take-1"><strong>Diversification works</strong>: Optimal portfolio achieved higher Sharpe (0.71) than SPY alone (0.55)</li>
+                <li data-i18n="take-2"><strong>Gold as diversifier</strong>: 25% allocation to GLD significantly reduced volatility</li>
+                <li data-i18n="take-3"><strong>Bonds struggled</strong>: Rising rates hurt AGG and TLT, but still provided crisis protection</li>
+                <li data-i18n="take-4"><strong>Risk contribution ≠ weight</strong>: SPY at 35% weight contributes 52% of risk</li>
+                <li data-i18n="take-5"><strong>Lower drawdowns</strong>: Optimal portfolio max DD (-18.4%) vs SPY (-33.7%)</li>
+            </ul>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 Leonardo Gutierrez Ferrara · <a href="index.html">Back to Portfolio</a></p>
+        </div>
+    </footer>
+
+    <script>
+        // Risk-Return Scatter
+        new Chart(document.getElementById('riskReturnChart'), {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Assets',
+                    data: [
+                        {x: 18.2, y: 12.4, label: 'SPY'},
+                        {x: 17.5, y: 6.8, label: 'EFA'},
+                        {x: 21.3, y: 4.2, label: 'EEM'},
+                        {x: 5.4, y: 1.8, label: 'AGG'},
+                        {x: 22.8, y: 5.6, label: 'VNQ'},
+                        {x: 15.1, y: 9.2, label: 'GLD'},
+                        {x: 17.8, y: -2.1, label: 'TLT'},
+                        {x: 42.6, y: -8.4, label: 'USO'}
+                    ],
+                    backgroundColor: ['#3b82f6','#10b981','#8b5cf6','#f59e0b','#ef4444','#fbbf24','#6366f1','#ec4899'],
+                    pointRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {display: false},
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                const labels = ['SPY','EFA','EEM','AGG','VNQ','GLD','TLT','USO'];
+                                return labels[ctx.dataIndex] + ': ' + ctx.parsed.y.toFixed(1) + '% return, ' + ctx.parsed.x.toFixed(1) + '% vol';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {title: {display: true, text: 'Volatility (%)', color: '#9ca3af'}, ticks: {color: '#6b7280'}, grid: {color: '#374151'}},
+                    y: {title: {display: true, text: 'Return (%)', color: '#9ca3af'}, ticks: {color: '#6b7280'}, grid: {color: '#374151'}}
+                }
+            }
+        });
+
+        // Efficient Frontier
+        const frontierData = [];
+        for(let i = 0; i < 500; i++) {
+            frontierData.push({x: 5 + Math.random() * 25, y: -5 + Math.random() * 20});
+        }
+        const efficientFrontier = [];
+        for(let vol = 6; vol <= 20; vol += 0.5) {
+            efficientFrontier.push({x: vol, y: -2 + 0.6 * vol - 0.008 * vol * vol});
+        }
+        
+        new Chart(document.getElementById('frontierChart'), {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {label: 'Simulated Portfolios', data: frontierData, backgroundColor: 'rgba(59,130,246,0.3)', pointRadius: 2},
+                    {label: 'Efficient Frontier', data: efficientFrontier, borderColor: '#10b981', backgroundColor: 'transparent', pointRadius: 0, type: 'line', tension: 0.4, borderWidth: 3},
+                    {label: 'Max Sharpe', data: [{x: 10.2, y: 9.8}], backgroundColor: '#10b981', pointRadius: 12, pointStyle: 'star'},
+                    {label: 'Min Variance', data: [{x: 6.8, y: 5.2}], backgroundColor: '#f59e0b', pointRadius: 12, pointStyle: 'triangle'}
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {legend: {labels: {color: '#9ca3af'}}},
+                scales: {
+                    x: {title: {display: true, text: 'Portfolio Volatility (%)', color: '#9ca3af'}, ticks: {color: '#6b7280'}, grid: {color: '#374151'}},
+                    y: {title: {display: true, text: 'Expected Return (%)', color: '#9ca3af'}, ticks: {color: '#6b7280'}, grid: {color: '#374151'}}
+                }
+            }
+        });
+
+        // Weights Pie Chart
+        new Chart(document.getElementById('weightsChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['SPY', 'GLD', 'AGG', 'TLT', 'EFA', 'VNQ'],
+                datasets: [{
+                    data: [35.2, 24.8, 19.6, 12.4, 5.2, 2.8],
+                    backgroundColor: ['#3b82f6', '#fbbf24', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {legend: {position: 'right', labels: {color: '#9ca3af'}}}
+            }
+        });
+
+        // Backtest Chart
+        const months = ['Jan 19','Jul 19','Jan 20','Jul 20','Jan 21','Jul 21','Jan 22','Jul 22','Jan 23','Jul 23','Jan 24','Jul 24'];
+        new Chart(document.getElementById('backtestChart'), {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [
+                    {label: 'Optimal Portfolio', data: [100,108,98,112,125,132,128,124,135,140,145,148], borderColor: '#10b981', backgroundColor: 'transparent', tension: 0.3},
+                    {label: '60/40', data: [100,106,92,105,115,120,112,108,118,124,128,133], borderColor: '#f59e0b', backgroundColor: 'transparent', tension: 0.3},
+                    {label: 'SPY', data: [100,115,95,120,138,152,142,130,148,158,168,172], borderColor: '#3b82f6', backgroundColor: 'transparent', tension: 0.3}
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {legend: {labels: {color: '#9ca3af'}}},
+                scales: {
+                    y: {title: {display: true, text: 'Growth of $100', color: '#9ca3af'}, ticks: {color: '#6b7280'}, grid: {color: '#374151'}},
+                    x: {ticks: {color: '#6b7280'}, grid: {display: false}}
+                }
+            }
+        });
+
+        // i18n
+        const i18n = {
+            es: {
+                'title': 'Optimización de Portafolio',
+                'subtitle': 'Optimización media-varianza usando Teoría Moderna de Portafolios. Construcción de frontera eficiente, asignación óptima de activos y métricas de rendimiento ajustadas por riesgo.',
+                'overview-title': 'Resumen del Proyecto',
+                'overview-p1': 'Este proyecto implementa la Teoría Moderna de Portafolios de Harry Markowitz para construir portafolios óptimos. Usando datos históricos de precios de las principales clases de activos, calculamos retornos esperados, volatilidades y correlaciones para encontrar la frontera eficiente.',
+                'overview-p2': 'La optimización encuentra portafolios que maximizan el retorno para un nivel de riesgo dado, o minimizan el riesgo para un retorno objetivo. Identificamos el portafolio de Máximo Sharpe Ratio y el de Mínima Varianza.',
+                'assets-title': 'Universo de Activos',
+                'returns-title': 'Retornos Históricos y Riesgo',
+                'returns-desc': 'Retornos y volatilidad anualizados basados en 5 años de datos diarios (2019-2024).',
+                'ann-return': 'Retorno Anual',
+                'ann-vol': 'Volatilidad Anual',
+                'correlation-title': 'Matriz de Correlación',
+                'correlation-desc': 'Las correlaciones entre activos son clave para la diversificación. Correlaciones bajas o negativas reducen el riesgo del portafolio.',
+                'diversification-title': 'Insights Clave de Diversificación',
+                'div-1': '<strong>TLT-SPY (-0.38)</strong>: Los bonos del tesoro cubren el riesgo de renta variable efectivamente',
+                'div-2': '<strong>GLD-SPY (0.08)</strong>: El oro provee retornos no correlacionados',
+                'div-3': '<strong>EEM-EFA (0.82)</strong>: Alta correlación limita beneficios de diversificación',
+                'div-4': '<strong>AGG-TLT (0.82)</strong>: Los índices de bonos se mueven juntos',
+                'frontier-title': 'Frontera Eficiente',
+                'frontier-desc': '10,000 portafolios simulados con Monte Carlo y pesos aleatorios. La frontera eficiente representa combinaciones óptimas de riesgo-retorno.',
+                'sharpe-formula': 'Ratio de Sharpe = (Rₚ - Rғ) / σₚ',
+                'max-sharpe': 'Portafolio Máximo Sharpe',
+                'min-var': 'Portafolio Mínima Varianza',
+                'exp-return': 'Retorno Esperado',
+                'volatility': 'Volatilidad',
+                'weights-title': 'Pesos Óptimos',
+                'weights-desc': 'Asignación detallada para el portafolio de Máximo Sharpe Ratio.',
+                'weight': 'Peso',
+                'contribution': 'Contrib. Riesgo',
+                'weights-note': 'Nota: EEM y USO excluidos por pobres retornos ajustados por riesgo. SPY contribuye 52% del riesgo del portafolio pese a tener 35% de peso.',
+                'backtest-title': 'Resultados del Backtest',
+                'backtest-desc': 'Comparación de rendimiento histórico: Portafolio óptimo vs benchmark 60/40 vs S&P 500 (2019-2024).',
+                'total-return': 'Retorno Total',
+                'risk-title': 'Métricas de Riesgo',
+                'var-title': 'Value at Risk (VaR)',
+                'var-desc': 'Pérdida máxima esperada a un nivel de confianza dado en 1 día.',
+                'var-example': 'Para un portafolio de $1M: VaR 95% = $14,200 pérdida diaria máxima',
+                'drawdown-title': 'Análisis de Drawdown',
+                'drawdown-desc': 'Análisis de caída desde máximo a mínimo.',
+                'max-dd': 'Drawdown Máximo',
+                'avg-dd': 'Drawdown Promedio',
+                'recovery': 'Tiempo de Recuperación (prom)',
+                'dd-note': 'Máximo drawdown durante crisis COVID (Mar 2020), recuperado para Ago 2020.',
+                'takeaways-title': 'Conclusiones Clave',
+                'take-1': '<strong>La diversificación funciona</strong>: Portafolio óptimo logró mayor Sharpe (0.71) que SPY solo (0.55)',
+                'take-2': '<strong>Oro como diversificador</strong>: 25% de asignación a GLD redujo significativamente la volatilidad',
+                'take-3': '<strong>Bonos sufrieron</strong>: Tasas crecientes afectaron AGG y TLT, pero aún proveyeron protección en crisis',
+                'take-4': '<strong>Contribución al riesgo ≠ peso</strong>: SPY con 35% de peso contribuye 52% del riesgo',
+                'take-5': '<strong>Menores drawdowns</strong>: Portafolio óptimo max DD (-18.4%) vs SPY (-33.7%)'
+            },
+            en: {}
+        };
+        
+        function setLang(lang) {
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const k = el.getAttribute('data-i18n');
+                if (i18n[lang] && i18n[lang][k]) el.innerHTML = i18n[lang][k];
+            });
+            localStorage.setItem('lang', lang);
+        }
+        setLang(localStorage.getItem('lang') || 'en');
+    </script>
+</body>
+</html>

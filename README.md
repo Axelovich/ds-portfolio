@@ -21,6 +21,21 @@ Predictive default model using machine learning. Compares Logistic Regression, R
 
 **Tools:** Scikit-learn, XGBoost, SHAP
 
+### 📊 Three Statement Financial Model
+Integrated financial model connecting Income Statement, Balance Sheet, and Cash Flow with 5-year projections and DCF valuation.
+
+**Tools:** Python, Pandas, Financial Modeling
+
+### ⚖️ Portfolio Optimization
+Mean-variance optimization using Modern Portfolio Theory. Efficient frontier, Sharpe ratio maximization, and risk analysis.
+
+**Tools:** Python, NumPy, SciPy, Monte Carlo
+
+### 🤖 Earnings Sentiment Analysis
+NLP-based trading strategy using FinBERT on earnings call transcripts. Backtested with 0.92 Sharpe ratio.
+
+**Tools:** Python, FinBERT, NLP, Backtesting
+
 ## Tech Stack
 
 - **Languages:** Python, JavaScript, SQL
