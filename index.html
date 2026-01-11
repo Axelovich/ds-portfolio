@@ -54,7 +54,7 @@
         .projects{display:grid;gap:16px}
         .project{background:var(--bg-card);border-radius:12px;padding:24px;display:flex;gap:20px;transition:background 0.2s;border:1px solid transparent}
         .project:hover{background:var(--bg-card-hover);border-color:var(--border)}
-        .project-icon{font-size:2rem;flex-shrink:0}
+        .project-icon{flex-shrink:0;color:var(--blue)}
         .project-content{flex:1}
         .project h3{font-size:1.1rem;font-weight:600;margin-bottom:6px}
         .project p{font-size:0.9rem;color:var(--text-secondary);margin-bottom:12px}
@@ -141,7 +141,7 @@
             <h2 class="section-title" data-i18n="section-projects">Projects</h2>
             <div class="projects">
                 <a href="01_fintechs_latam.html" class="project">
-                    <div class="project-icon">📈</div>
+                    <div class="project-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
                     <div class="project-content">
                         <h3 data-i18n="p1-title">LATAM Fintechs Analysis</h3>
                         <p data-i18n="p1-desc">Performance comparison of MELI, Nubank, DLocal and StoneCo. Risk metrics and valuation analysis.</p>
@@ -150,7 +150,7 @@
                     <div class="project-arrow">→</div>
                 </a>
                 <a href="02_macro_argentina.html" class="project">
-                    <div class="project-icon">🇦🇷</div>
+                    <div class="project-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
                     <div class="project-content">
                         <h3 data-i18n="p2-title">Argentina Macro Dashboard</h3>
                         <p data-i18n="p2-desc">Real-time monitoring of exchange rates, inflation and interest rates from BCRA APIs.</p>
@@ -159,7 +159,7 @@
                     <div class="project-arrow">→</div>
                 </a>
                 <a href="03_credit_scoring.html" class="project">
-                    <div class="project-icon">🎯</div>
+                    <div class="project-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
                     <div class="project-content">
                         <h3 data-i18n="p3-title">Credit Scoring Model</h3>
                         <p data-i18n="p3-desc">Predictive default model with 0.867 AUC-ROC. Random Forest vs XGBoost comparison.</p>
@@ -168,7 +168,7 @@
                     <div class="project-arrow">→</div>
                 </a>
                 <a href="04_financial_model.html" class="project">
-                    <div class="project-icon">📊</div>
+                    <div class="project-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
                     <div class="project-content">
                         <h3 data-i18n="p4-title">Three Statement Financial Model</h3>
                         <p data-i18n="p4-desc">Integrated financial model with Income Statement, Balance Sheet, Cash Flow and DCF valuation.</p>
@@ -177,7 +177,7 @@
                     <div class="project-arrow">→</div>
                 </a>
                 <a href="05_portfolio_optimization.html" class="project">
-                    <div class="project-icon">⚖️</div>
+                    <div class="project-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 16v-4a4 4 0 0 0-8 0v4"/><path d="M4 11l.5 6a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2l.5-6"/><path d="M12 4v4"/><circle cx="12" cy="3" r="1"/></svg></div>
                     <div class="project-content">
                         <h3 data-i18n="p5-title">Portfolio Optimization</h3>
                         <p data-i18n="p5-desc">Mean-variance optimization with efficient frontier, Sharpe ratio maximization and risk analysis.</p>
@@ -186,7 +186,7 @@
                     <div class="project-arrow">→</div>
                 </a>
                 <a href="06_sentiment_analysis.html" class="project">
-                    <div class="project-icon">🤖</div>
+                    <div class="project-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5a2.5 2.5 0 0 0-4.96-.46 2.5 2.5 0 0 0-1.98 3 2.5 2.5 0 0 0-1.32 4.24 3 3 0 0 0 .34 5.58 2.5 2.5 0 0 0 2.96 3.08 2.5 2.5 0 0 0 4.91.05L12 20V4.5Z"/><path d="M16 8V5c0-1.1.9-2 2-2"/><path d="M12 13h4"/><path d="M12 18h6a2 2 0 0 1 2 2v1"/><path d="M12 8h8"/><path d="M20.5 8a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/><path d="M16.5 13a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/><path d="M20.5 21a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/><path d="M18.5 3a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0Z"/></svg></div>
                     <div class="project-content">
                         <h3 data-i18n="p6-title">Earnings Sentiment Analysis</h3>
                         <p data-i18n="p6-desc">NLP trading strategy using FinBERT on earnings calls. Backtested with 0.92 Sharpe ratio.</p>
